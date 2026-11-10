@@ -1,824 +1,466 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Gestão de Farm & Metas - GTA RP</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Gerenciador de Farm - Facção GTA RP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            500: '#10b981', // Emerald / Neon Green
-                            600: '#059669',
-                            darkBg: '#080b12',
-                            cardBg: '#0f172a',
-                            border: '#1e293b',
-                            purpleAccent: '#a855f7'
-                        }
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        accent: '#10b981',
+                        accenthover: '#059669'
                     }
                 }
             }
         }
     </script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #080b12;
-            color: #f1f5f9;
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #080b12;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased pb-12">
 
-    <!-- Header / Navbar -->
-    <header class="bg-brand-cardBg border-b border-brand-border sticky top-0 z-30 shadow-2xl">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/30">
-                    <i data-lucide="shield-check" class="w-6 h-6 text-emerald-400"></i>
+    <!-- TELA DE LOGIN -->
+    <div id="loginScreen" class="fixed inset-0 bg-darkbg/95 z-50 flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-slate-700 p-8 rounded-2xl shadow-2xl max-w-md w-full space-y-6">
+            <div class="text-center">
+                <div class="bg-emerald-500/10 text-emerald-400 w-16 h-16 mx-auto rounded-2xl flex items-center justify-center border border-emerald-500/20 mb-3">
+                    <i class="fa-solid fa-shield-halved text-3xl"></i>
+                </div>
+                <h1 class="text-xl font-bold">FARM GIVOS - ACESSO</h1>
+                <p class="text-xs text-slate-400 mt-1">Digite seu passaporte e senha para entrar</p>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Passaporte (ID do Jogo) ou Master</label>
+                    <input type="text" id="loginPassport" required placeholder="Ex: 12 ou 488457@" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <h1 class="text-base font-extrabold text-white tracking-wider uppercase flex items-center gap-2">
-                        Painel de Farm <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">FACÇÃO RP</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Controle do Baú & Metas Semanais da Tropa</p>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Senha</label>
+                    <input type="password" id="loginPassword" required placeholder="Sua senha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30">
+                    Entrar no Sistema
+                </button>
+                <p class="text-[11px] text-slate-500 text-center">Gerente use o passaporte com a senha master (<span class="text-amber-400">488457@</span>).</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- HEADER PRINCIPAL -->
+    <header class="bg-cardbg border-b border-slate-700 shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl border border-emerald-500/20">
+                    <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">FARM GIVOS</h1>
+                    <p class="text-xs text-slate-400">Logado como: <span id="userSessionBadge" class="text-emerald-400 font-semibold"></span></p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
-                <button onclick="exportData()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Exportar CSV</span>
-                </button>
-                <button onclick="clearHistory()" class="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-xs font-semibold rounded-lg border border-red-800/50 text-red-300 transition">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Resetar Histórico</span>
+                <div id="managerIndicator" class="hidden items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg text-amber-400 text-xs font-bold">
+                    <i class="fa-solid fa-crown"></i> Modo Gerente Ativo
+                </div>
+                <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sair
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
-        
-        <!-- 1. DASHBOARD DE ESTOQUE ATUAL -->
-        <section>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                    <i data-lucide="box" class="w-4 h-4 text-emerald-400"></i>
-                    Estoque Geral no Baú
+    <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
+
+        <!-- PAINEL RESTRITO DO GERENTE -->
+        <section id="managerPanel" class="bg-cardbg p-6 rounded-2xl border border-amber-500/30 shadow-xl hidden">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
+                <h2 class="text-lg font-bold flex items-center gap-2 text-amber-400">
+                    <i class="fa-solid fa-user-shield"></i> Painel de Controle do Gerente (Metas)
                 </h2>
-                <button onclick="openCatalogModal()" class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold bg-emerald-950/40 px-3 py-1.5 rounded-lg border border-emerald-800/50 transition">
-                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                    Gerenciar Catálogo
-                </button>
+                <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-md border border-amber-500/20 font-medium">Área Restrita</span>
             </div>
 
-            <div id="stockGrid" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                <!-- Cards renderizados dinamicamente -->
-            </div>
-        </section>
-
-        <!-- 2. PAINEL DE METAS SEMANAIS DA TROPA (ÁREA DO GERENTE) -->
-        <section class="bg-brand-cardBg border border-brand-border rounded-xl p-5 shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none"></div>
-
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-brand-border pb-4 mb-4">
-                <div>
-                    <h2 class="text-base font-bold text-white flex items-center gap-2">
-                        <i data-lucide="target" class="w-5 h-5 text-purple-400"></i>
-                        Metas Semanais dos Membros (Gerência)
-                    </h2>
-                    <p class="text-xs text-slate-400">O progresso é calculado automaticamente com base nas entregas registradas.</p>
-                </div>
-                <button onclick="openGoalModal()" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-purple-900/30 transition">
-                    <i data-lucide="user-plus" class="w-4 h-4"></i>
-                    Definir / Editar Meta
-                </button>
-            </div>
-
-            <!-- Lista de Metas dos Membros -->
-            <div id="goalsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Cards de Metas Dinâmicos -->
-            </div>
-            
-            <div id="emptyGoalsMsg" class="hidden text-center py-6 text-slate-500 text-xs">
-                Nenhuma meta cadastrada ainda. Clique em "Definir / Editar Meta" para iniciar a cobrança semanal.
-            </div>
-        </section>
-
-        <!-- 3. FORMULÁRIO DE REGISTRO COM FOTO -->
-        <section class="bg-brand-cardBg border border-brand-border rounded-xl p-5 shadow-2xl">
-            <div class="border-b border-brand-border pb-3 mb-5">
-                <h2 class="text-base font-bold text-white flex items-center gap-2">
-                    <i data-lucide="file-plus" class="w-5 h-5 text-emerald-400"></i>
-                    Novo Lançamento de Farm (Com foto do Baú)
-                </h2>
-                <p class="text-xs text-slate-400">Registre as entradas ou saídas enviando obrigatoriamente a foto da print do baú.</p>
-            </div>
-
-            <form id="farmForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    
-                    <!-- Membro -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Membro / Passaporte <span class="text-emerald-400">*</span></label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                                <i data-lucide="user" class="w-4 h-4"></i>
-                            </span>
-                            <input type="text" id="memberName" required placeholder="Ex: Bolt | #992" class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold text-slate-300">Definir Meta Semanal (Geral)</h3>
+                    <form id="goalForm" class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Passaporte / Nome do Membro</label>
+                            <input type="text" id="goalPassport" required placeholder="Ex: Bolt [ID 12]" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
                         </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Quantidade Meta Semanal (Total dos 3 itens)</label>
+                            <input type="number" id="goalTargetValue" min="1" required placeholder="Ex: 1500" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2 px-3 rounded-lg text-xs transition">
+                                Salvar Meta
+                            </button>
+                            <button type="button" onclick="resetAllGoalsAndLogs()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-2 px-3 rounded-lg text-xs transition flex items-center gap-1.5" title="Zerar metas e limpar histórico/fotos">
+                                <i class="fa-solid fa-rotate-right"></i> Resetar Semana (Zerar Tudo)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-2">
+                    <p class="font-bold text-slate-300"><i class="fa-solid fa-circle-info text-amber-400"></i> Como funciona o reset:</p>
+                    <p>Ao clicar em <strong>Resetar Semana</strong>, o sistema limpa todas as movimentações, apaga as imagens armazenadas e zera o progresso das metas para começarem do zero.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD DE ESTOQUE -->
+        <section>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold flex items-center gap-2 text-slate-200">
+                    <i class="fa-solid fa-chart-pie text-emerald-400"></i> Estoque Atual no Baú
+                </h2>
+                <span class="text-xs text-slate-400 bg-cardbg px-3 py-1 rounded-full border border-slate-700">Atualizado em tempo real</span>
+            </div>
+            <div id="stockCards" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+        </section>
+
+        <!-- FORMULÁRIO E METAS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- REGISTRAR FARM -->
+            <section class="lg:col-span-1 bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
+                    <i class="fa-solid fa-circle-plus"></i> Registrar Movimentação
+                </h2>
+                
+                <form id="farmForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Membro (Passaporte / Nome)</label>
+                        <input type="text" id="memberName" readonly class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-400 cursor-not-allowed">
                     </div>
 
-                    <!-- Item -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Item do Baú <span class="text-emerald-400">*</span></label>
-                        <select id="itemSelect" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
-                            <!-- Opções preenchidas por JS -->
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Item</label>
+                        <select id="itemSelect" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                            <option value="Flor de Cannabis">Flor de Cannabis</option>
+                            <option value="Thinner">Thinner</option>
+                            <option value="Quetamina">Quetamina</option>
                         </select>
                     </div>
 
-                    <!-- Operação -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Tipo</label>
+                            <select id="actionType" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                                <option value="entrada">Entrada (+)</option>
+                                <option value="saida">Saída (-)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Quantidade</label>
+                            <input type="number" id="itemQuantity" min="1" required placeholder="Ex: 100" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Tipo de Operação <span class="text-emerald-400">*</span></label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="operation" value="ENTRY" checked class="peer sr-only">
-                                <div class="w-full text-center py-2 rounded-lg text-xs font-bold border border-slate-700 bg-slate-900 text-slate-300 peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-500 transition flex items-center justify-center gap-1">
-                                    <i data-lucide="arrow-down-left" class="w-4 h-4"></i> Entregar (+)
-                                </div>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="operation" value="EXIT" class="peer sr-only">
-                                <div class="w-full text-center py-2 rounded-lg text-xs font-bold border border-slate-700 bg-slate-900 text-slate-300 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-500 transition flex items-center justify-center gap-1">
-                                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i> Retirar (-)
-                                </div>
-                            </label>
-                        </div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Print / Foto do Baú <span class="text-red-400">*Obrigatório</span></label>
+                        <input type="file" id="bauPhoto" accept="image/*" required class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-500/10 file:text-emerald-400 hover:file:bg-emerald-500/20 cursor-pointer">
                     </div>
 
-                    <!-- Quantidade -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Quantidade <span class="text-emerald-400">*</span></label>
-                        <input type="number" id="itemQuantity" min="1" required placeholder="0" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
-                    </div>
-
-                </div>
-
-                <!-- UPLOAD DA FOTO DO BAÚ -->
-                <div class="pt-2">
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Comprovante de Foto do Baú <span class="text-emerald-400">*</span></label>
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <div class="flex-1 w-full">
-                            <label for="imageInput" class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-700 hover:border-emerald-500/50 rounded-xl cursor-pointer bg-slate-900/50 hover:bg-slate-900 transition">
-                                <div class="flex flex-col items-center justify-center pt-3 pb-3">
-                                    <i data-lucide="camera" class="w-6 h-6 text-slate-400 mb-1"></i>
-                                    <p class="text-xs text-slate-400"><span class="font-bold text-emerald-400">Clique para anexar</span> a print da foto no baú</p>
-                                    <p class="text-[10px] text-slate-500">Formatos aceitos: PNG, JPG, WEBP</p>
-                                </div>
-                                <input id="imageInput" type="file" accept="image/*" class="hidden" onchange="previewImage(event)">
-                            </label>
-                        </div>
-
-                        <!-- Container do Preview -->
-                        <div id="previewContainer" class="hidden relative border border-slate-700 rounded-xl overflow-hidden bg-slate-900 w-24 h-24 shrink-0 shadow-lg">
-                            <img id="imagePreview" src="" alt="Preview" class="w-full h-full object-cover">
-                            <button type="button" onclick="removeImagePreview()" class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-500 shadow">
-                                <i data-lucide="x" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SUBMIT -->
-                <div class="flex justify-end pt-2">
-                    <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-emerald-950/50 transition flex items-center justify-center gap-2">
-                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                        Confirmar & Registrar Farm
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Salvar Registro
                     </button>
-                </div>
-            </form>
-        </section>
+                </form>
+            </section>
 
-        <!-- 4. HISTÓRICO DE LOGS -->
-        <section class="bg-brand-cardBg border border-brand-border rounded-xl p-5 shadow-2xl">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-border pb-4 mb-4">
-                <div>
-                    <h2 class="text-base font-bold text-white flex items-center gap-2">
-                        <i data-lucide="history" class="w-5 h-5 text-emerald-400"></i>
-                        Histórico de Registros (Logs)
-                    </h2>
-                    <p class="text-xs text-slate-400">Linha do tempo de todas as movimentações e fotos salvas.</p>
+            <!-- ACOMPANHAMENTO DE METAS -->
+            <section class="lg:col-span-2 bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
+                    <i class="fa-solid fa-bullseye text-emerald-400"></i> Progresso das Metas Semanais
+                </h2>
+                <div class="space-y-4 flex-1 overflow-y-auto max-h-[350px]" id="goalsListContainer">
+                    <!-- Preenchido via JS -->
                 </div>
+            </section>
 
-                <div class="relative w-full sm:w-64">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                        <i data-lucide="search" class="w-4 h-4"></i>
-                    </span>
-                    <input type="text" id="searchInput" oninput="renderHistory()" placeholder="Buscar por membro ou item..." class="w-full pl-9 pr-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-                </div>
-            </div>
+        </div>
 
-            <!-- Tabela -->
+        <!-- HISTÓRICO DE MOVIMENTAÇÕES -->
+        <section class="bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
+                <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i> Histórico de Registros
+            </h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
-                            <th class="py-3 px-3">Data / Hora</th>
-                            <th class="py-3 px-3">Membro</th>
-                            <th class="py-3 px-3">Item</th>
-                            <th class="py-3 px-3 text-center">Tipo</th>
-                            <th class="py-3 px-3 text-right">Qtd</th>
-                            <th class="py-3 px-3 text-center">Foto do Baú</th>
-                            <th class="py-3 px-3 text-center">Ações</th>
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 border-b border-slate-700">
+                        <tr>
+                            <th class="p-3">Data/Hora</th>
+                            <th class="p-3">Membro</th>
+                            <th class="p-3">Item</th>
+                            <th class="p-3">Ação</th>
+                            <th class="p-3">Qtd</th>
+                            <th class="p-3">Foto do Baú</th>
                         </tr>
                     </thead>
-                    <tbody id="historyTableBody" class="divide-y divide-slate-800/80 text-slate-300">
-                        <!-- Renderizado via JS -->
+                    <tbody id="logsTableBody" class="divide-y divide-slate-800">
+                        <!-- Preenchido via JS -->
                     </tbody>
                 </table>
-                
-                <div id="emptyHistoryMsg" class="hidden text-center py-8 text-slate-500 text-xs">
-                    Nenhum registro encontrado.
-                </div>
             </div>
         </section>
 
     </main>
 
-    <!-- MODAL 1: GERENCIAR CATÁLOGO DE ITENS -->
-    <div id="catalogModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-brand-cardBg border border-brand-border rounded-xl max-w-md w-full p-5 shadow-2xl">
-            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="boxes" class="w-4 h-4 text-emerald-400"></i>
-                    Catálogo de Itens do Baú
-                </h3>
-                <button onclick="closeCatalogModal()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-
-            <div class="py-4 space-y-4">
-                <div class="flex gap-2">
-                    <input type="text" id="newItemInput" placeholder="Ex: Pacote de C4" class="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
-                    <button onclick="addNewCatalogItem()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold">
-                        Adicionar
-                    </button>
-                </div>
-
-                <div class="max-h-60 overflow-y-auto space-y-2 pr-1" id="catalogList">
-                    <!-- Lista dinâmica -->
-                </div>
-            </div>
-
-            <div class="pt-3 border-t border-slate-800 text-right">
-                <button onclick="closeCatalogModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg font-medium">
-                    Fechar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 2: DEFINIR META DO GERENTE -->
-    <div id="goalModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-brand-cardBg border border-brand-border rounded-xl max-w-md w-full p-5 shadow-2xl">
-            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="target" class="w-4 h-4 text-purple-400"></i>
-                    Definir / Editar Meta Semanal
-                </h3>
-                <button onclick="closeGoalModal()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-
-            <form onsubmit="handleSaveGoal(event)" class="py-4 space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Membro / Passaporte</label>
-                    <input type="text" id="goalMemberInput" required placeholder="Ex: Bolt | #992" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Item da Meta</label>
-                    <select id="goalItemSelect" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500">
-                        <!-- Preenchido via JS -->
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Quantidade da Meta Semanal</label>
-                    <input type="number" id="goalTargetInput" min="1" required placeholder="Ex: 500" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500">
-                </div>
-
-                <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" onclick="closeGoalModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg font-medium">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg shadow-lg">
-                        Salvar Meta
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 3: VISUALIZADOR DA FOTO -->
-    <div id="imageModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center hidden p-4" onclick="closeImageModal()">
-        <div class="relative max-w-4xl w-full flex flex-col items-center">
-            <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white hover:text-emerald-400 flex items-center gap-1 text-xs font-bold">
-                <i data-lucide="x" class="w-5 h-5"></i> Fechar (ESC)
+    <!-- MODAL DE VISUALIZAÇÃO DE FOTO -->
+    <div id="photoModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-3xl w-full bg-cardbg rounded-xl border border-slate-700 p-2">
+            <button onclick="closePhotoModal()" class="absolute -top-3 -right-3 bg-red-600 text-white w-8 h-8 rounded-full font-bold shadow-lg flex items-center justify-center hover:bg-red-500">
+                <i class="fa-solid fa-xmark"></i>
             </button>
-            <img id="modalImg" src="" alt="Print do Baú" class="max-h-[85vh] max-w-full rounded-xl border border-slate-700 shadow-2xl object-contain">
+            <img id="modalImage" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-lg">
         </div>
     </div>
 
-    <!-- NOTIFICAÇÃO TOAST -->
-    <div id="toast" class="fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2.5 rounded-lg shadow-xl text-xs font-bold flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
-        <i data-lucide="check-circle" class="w-4 h-4"></i>
-        <span id="toastMsg">Operação realizada!</span>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- SCRIPT DE CONTROLE -->
     <script>
-        // ITENS PADRÃO SOLICITADOS
-        const DEFAULT_ITEMS = ['Flor de Cannabis', 'Thinner', 'Quetamina'];
-        
-        let catalog = JSON.parse(localStorage.getItem('gta_farm_catalog_v2')) || DEFAULT_ITEMS;
-        let logs = JSON.parse(localStorage.getItem('gta_farm_logs_v2')) || [];
-        let goals = JSON.parse(localStorage.getItem('gta_farm_goals_v2')) || []; // [{member, item, target}]
-        let currentImageData = null;
+        const MASTER_PASSWORD = "488457@";
+        let currentUser = JSON.parse(localStorage.getItem('givos_user')) || null;
+
+        // ELEMENTOS DOM
+        const loginScreen = document.getElementById('loginScreen');
+        const loginForm = document.getElementById('loginForm');
+        const userSessionBadge = document.getElementById('userSessionBadge');
+        const managerIndicator = document.getElementById('managerIndicator');
+        const managerPanel = document.getElementById('managerPanel');
+        const memberNameInput = document.getElementById('memberName');
+
+        // DADOS
+        let inventory = JSON.parse(localStorage.getItem('givos_stock')) || {
+            "Flor de Cannabis": 0,
+            "Thinner": 0,
+            "Quetamina": 0
+        };
+        let logs = JSON.parse(localStorage.getItem('givos_logs')) || [];
+        let goals = JSON.parse(localStorage.getItem('givos_goals')) || {}; // { "Bolt": 1000 }
 
         // INICIALIZAÇÃO
-        window.onload = function() {
-            lucide.createIcons();
-            renderCatalogSelects();
-            renderStock();
-            renderGoals();
-            renderHistory();
-        };
-
-        function saveData() {
-            localStorage.setItem('gta_farm_catalog_v2', JSON.stringify(catalog));
-            localStorage.setItem('gta_farm_logs_v2', JSON.stringify(logs));
-            localStorage.setItem('gta_farm_goals_v2', JSON.stringify(goals));
-        }
-
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            toastMsg.innerText = message;
-            
-            if(isError) {
-                toast.classList.remove('bg-emerald-600');
-                toast.classList.add('bg-red-600');
-            } else {
-                toast.classList.remove('bg-red-600');
-                toast.classList.add('bg-emerald-600');
+        window.addEventListener('DOMContentLoaded', () => {
+            if (currentUser) {
+                initApp();
             }
+        });
 
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        // FOTO / PREVIEW
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 3 * 1024 * 1024) {
-                showToast('A imagem deve ter no máximo 3MB!', true);
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentImageData = e.target.result;
-                document.getElementById('imagePreview').src = currentImageData;
-                document.getElementById('previewContainer').classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function removeImagePreview() {
-            currentImageData = null;
-            document.getElementById('imageInput').value = '';
-            document.getElementById('previewContainer').classList.add('hidden');
-        }
-
-        // SUBMIT DO FORMULÁRIO DE LANÇAMENTO
-        function handleFormSubmit(e) {
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const pass = document.getElementById('loginPassport').value.trim();
+            const pwd = document.getElementById('loginPassword').value.trim();
 
-            const member = document.getElementById('memberName').value.trim();
-            const item = document.getElementById('itemSelect').value;
-            const operation = document.querySelector('input[name="operation"]:checked').value;
-            const quantity = parseInt(document.getElementById('itemQuantity').value, 10);
-
-            if (!member || !item || isNaN(quantity) || quantity <= 0) {
-                showToast('Preencha os campos corretamente.', true);
-                return;
+            if (pass === MASTER_PASSWORD || pwd === MASTER_PASSWORD) {
+                currentUser = { name: "Gerente (Admin)", isManager: true };
+            } else {
+                if(!pwd) {
+                    alert("Digite a senha.");
+                    return;
+                }
+                currentUser = { name: `Passaporte ${pass}`, isManager: false };
             }
 
-            if (!currentImageData) {
-                showToast('É obrigatório anexar a foto do baú!', true);
-                return;
+            localStorage.setItem('givos_user', JSON.stringify(currentUser));
+            initApp();
+        });
+
+        function logout() {
+            localStorage.removeItem('givos_user');
+            location.reload();
+        }
+
+        function initApp() {
+            loginScreen.classList.add('hidden');
+            userSessionBadge.textContent = currentUser.name;
+            memberNameInput.value = currentUser.name;
+
+            if (currentUser.isManager) {
+                managerIndicator.classList.remove('hidden');
+                managerIndicator.classList.add('flex');
+                managerPanel.classList.remove('hidden');
             }
 
-            const newLog = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleString('pt-BR'),
-                member,
-                item,
-                operation,
-                quantity,
-                image: currentImageData
-            };
-
-            logs.unshift(newLog);
-            saveData();
-
-            document.getElementById('farmForm').reset();
-            removeImagePreview();
-            
             renderStock();
+            renderLogs();
             renderGoals();
-            renderHistory();
-            showToast('Farm registrado com sucesso!');
         }
 
-        // CALCULOS DE ESTOQUE GERAL
-        function calculateStock() {
-            const stock = {};
-            catalog.forEach(item => stock[item] = 0);
+        // REGISTRAR FARM
+        document.getElementById('farmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const item = document.getElementById('itemSelect').value;
+            const type = document.getElementById('actionType').value;
+            const qty = parseInt(document.getElementById('itemQuantity').value);
+            const photoInput = document.getElementById('bauPhoto');
 
-            logs.forEach(log => {
-                if (stock[log.item] !== undefined) {
-                    if (log.operation === 'ENTRY') stock[log.item] += log.quantity;
-                    if (log.operation === 'EXIT') stock[log.item] -= log.quantity;
+            if(photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoUrl = e.target.result;
+
+                    // Atualiza estoque
+                    if (type === 'entrada') {
+                        inventory[item] = (inventory[item] || 0) + qty;
+                    } else {
+                        inventory[item] = Math.max(0, (inventory[item] || 0) - qty);
+                    }
+
+                    // Adiciona log
+                    const newLog = {
+                        date: new Date().toLocaleString('pt-BR'),
+                        member: currentUser.name,
+                        item,
+                        type,
+                        qty,
+                        photo: photoUrl
+                    };
+                    logs.unshift(newLog);
+
+                    saveAndRefresh();
+                    document.getElementById('farmForm').reset();
+                    memberNameInput.value = currentUser.name;
+                    alert("Movimentação registrada com sucesso!");
                 }
-            });
+                reader.readAsDataURL(photoInput.files[0]);
+            }
+        });
 
-            return stock;
+        // GERENCIAR METAS
+        document.getElementById('goalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const member = document.getElementById('goalPassport').value.trim();
+            const target = parseInt(document.getElementById('goalTargetValue').value);
+
+            goals[member] = target;
+            localStorage.setItem('givos_goals', JSON.stringify(goals));
+            renderGoals();
+            document.getElementById('goalForm').reset();
+            alert("Meta definida com sucesso!");
+        });
+
+        function resetAllGoalsAndLogs() {
+            if(confirm("Tem certeza que deseja resetar a semana? Isso vai apagar todo o histórico de farm, as fotos salvas e as metas de todo mundo!")) {
+                localStorage.removeItem('givos_logs');
+                localStorage.removeItem('givos_goals');
+                inventory = { "Flor de Cannabis": 0, "Thinner": 0, "Quetamina": 0 };
+                localStorage.setItem('givos_stock', JSON.stringify(inventory));
+                logs = [];
+                goals = {};
+                renderStock();
+                renderLogs();
+                renderGoals();
+                alert("Semana resetada com sucesso!");
+            }
         }
 
-        // CALCULOS DE ENTREGA INDIVIDUAL DE CADA MEMBRO (PARA A META)
-        function getMemberProgress(memberName, itemName) {
-            let total = 0;
-            logs.forEach(log => {
-                if (log.member.toLowerCase() === memberName.toLowerCase() && log.item === itemName) {
-                    if (log.operation === 'ENTRY') total += log.quantity;
-                    if (log.operation === 'EXIT') total -= log.quantity;
-                }
-            });
-            return Math.max(0, total);
+        function saveAndRefresh() {
+            localStorage.setItem('givos_stock', JSON.stringify(inventory));
+            localStorage.setItem('givos_logs', JSON.stringify(logs));
+            localStorage.setItem('givos_goals', JSON.stringify(goals));
+            renderStock();
+            renderLogs();
+            renderGoals();
         }
 
         // RENDERIZAR ESTOQUE
         function renderStock() {
-            const stockGrid = document.getElementById('stockGrid');
-            const totals = calculateStock();
-            stockGrid.innerHTML = '';
-
-            catalog.forEach(item => {
-                const amount = totals[item] || 0;
-                const isNegative = amount < 0;
-                
-                const card = document.createElement('div');
-                card.className = `bg-brand-cardBg border ${isNegative ? 'border-red-900/50' : 'border-brand-border'} rounded-xl p-4 shadow-md flex flex-col justify-between hover:border-emerald-500/40 transition`;
-                card.innerHTML = `
-                    <div class="flex items-center justify-between text-slate-400 mb-2">
-                        <span class="text-xs font-bold tracking-wider uppercase truncate">${item}</span>
-                        <i data-lucide="package" class="w-4 h-4 text-emerald-400"></i>
-                    </div>
-                    <div>
-                        <span class="text-xl font-extrabold ${isNegative ? 'text-red-400' : 'text-white'}">
-                            ${amount.toLocaleString('pt-BR')}
-                        </span>
-                        <span class="text-xs text-slate-500 ml-1">unidades</span>
-                    </div>
-                `;
-                stockGrid.appendChild(card);
-            });
-            lucide.createIcons();
-        }
-
-        // RENDERIZAR PAINEL DE METAS
-        function renderGoals() {
-            const goalsGrid = document.getElementById('goalsGrid');
-            const emptyMsg = document.getElementById('emptyGoalsMsg');
-            goalsGrid.innerHTML = '';
-
-            if (goals.length === 0) {
-                emptyMsg.classList.remove('hidden');
-                return;
-            } else {
-                emptyMsg.classList.add('hidden');
-            }
-
-            goals.forEach((goal, index) => {
-                const currentAmount = getMemberProgress(goal.member, goal.item);
-                const percent = Math.min(100, Math.round((currentAmount / goal.target) * 100));
-                const isCompleted = currentAmount >= goal.target;
-
-                const card = document.createElement('div');
-                card.className = `bg-slate-900 border ${isCompleted ? 'border-emerald-500/50' : 'border-slate-800'} rounded-xl p-4 flex flex-col justify-between relative shadow-lg`;
-                
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
-                                    <i data-lucide="user" class="w-3.5 h-3.5 text-purple-400"></i>
-                                    ${escapeHtml(goal.member)}
-                                </h3>
-                                <p class="text-[11px] text-slate-400">Meta: <span class="text-purple-300 font-semibold">${goal.item}</span></p>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                ${isCompleted ? `
-                                    <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                                        <i data-lucide="check" class="w-3 h-3"></i> Concluída
-                                    </span>
-                                ` : `
-                                    <span class="text-[10px] bg-purple-950 text-purple-300 border border-purple-800 px-2 py-0.5 rounded-full font-bold">
-                                        ${percent}%
-                                    </span>
-                                `}
-                                <button onclick="deleteGoal(${index})" class="text-slate-600 hover:text-red-400 p-1">
-                                    <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Barra de Progresso -->
-                        <div class="mt-3">
-                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mb-1">
-                                <span>Entregue: <strong class="text-white">${currentAmount.toLocaleString('pt-BR')}</strong></span>
-                                <span>Objetivo: <strong class="text-white">${goal.target.toLocaleString('pt-BR')}</strong></span>
-                            </div>
-                            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
-                                <div class="h-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-purple-500'}" style="width: ${percent}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                goalsGrid.appendChild(card);
-            });
-            lucide.createIcons();
-        }
-
-        // GERENCIAR METAS
-        function openGoalModal() {
-            renderCatalogSelects();
-            document.getElementById('goalModal').classList.remove('hidden');
-        }
-
-        function closeGoalModal() {
-            document.getElementById('goalModal').classList.add('hidden');
-        }
-
-        function handleSaveGoal(e) {
-            e.preventDefault();
-            const member = document.getElementById('goalMemberInput').value.trim();
-            const item = document.getElementById('goalItemSelect').value;
-            const target = parseInt(document.getElementById('goalTargetInput').value, 10);
-
-            if (!member || !item || isNaN(target) || target <= 0) {
-                showToast('Preencha os dados da meta adequadamente.', true);
-                return;
-            }
-
-            // Atualiza meta se já existir ou adiciona nova
-            const existingIndex = goals.findIndex(g => g.member.toLowerCase() === member.toLowerCase() && g.item === item);
-            if (existingIndex >= 0) {
-                goals[existingIndex].target = target;
-            } else {
-                goals.push({ member, item, target });
-            }
-
-            saveData();
-            renderGoals();
-            closeGoalModal();
-            showToast('Meta definida com sucesso!');
-        }
-
-        function deleteGoal(index) {
-            goals.splice(index, 1);
-            saveData();
-            renderGoals();
-            showToast('Meta removida!');
-        }
-
-        // RENDERIZAR HISTÓRICO
-        function renderHistory() {
-            const tbody = document.getElementById('historyTableBody');
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const emptyMsg = document.getElementById('emptyHistoryMsg');
-            
-            tbody.innerHTML = '';
-
-            const filteredLogs = logs.filter(log => 
-                log.member.toLowerCase().includes(search) || 
-                log.item.toLowerCase().includes(search)
-            );
-
-            if (filteredLogs.length === 0) {
-                emptyMsg.classList.remove('hidden');
-                return;
-            } else {
-                emptyMsg.classList.add('hidden');
-            }
-
-            filteredLogs.forEach(log => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-900/60 transition';
-
-                const isEntry = log.operation === 'ENTRY';
-                
-                tr.innerHTML = `
-                    <td class="py-3 px-3 text-slate-400 text-[11px] font-mono">${log.timestamp}</td>
-                    <td class="py-3 px-3 font-semibold text-white">${escapeHtml(log.member)}</td>
-                    <td class="py-3 px-3"><span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[11px] font-mono border border-slate-700">${log.item}</span></td>
-                    <td class="py-3 px-3 text-center">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${isEntry ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' : 'bg-red-950/60 text-red-400 border-red-800'}">
-                            ${isEntry ? '+ ENTRADA' : '- SAÍDA'}
-                        </span>
-                    </td>
-                    <td class="py-3 px-3 text-right font-mono font-bold ${isEntry ? 'text-emerald-400' : 'text-red-400'}">
-                        ${isEntry ? '+' : '-'}${log.quantity.toLocaleString('pt-BR')}
-                    </td>
-                    <td class="py-3 px-3 text-center">
-                        ${log.image ? `
-                            <button onclick="openImageModal('${log.image}')" class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-[11px] font-semibold bg-emerald-950/50 border border-emerald-800/60 px-2.5 py-1 rounded-lg">
-                                <i data-lucide="image" class="w-3.5 h-3.5"></i> Ver Print
-                            </button>
-                        ` : '<span class="text-slate-600 text-[11px]">Sem foto</span>'}
-                    </td>
-                    <td class="py-3 px-3 text-center">
-                        <button onclick="deleteLog(${log.id})" class="text-slate-500 hover:text-red-400 p-1" title="Excluir este registro">
-                            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            lucide.createIcons();
-        }
-
-        function deleteLog(id) {
-            logs = logs.filter(log => log.id !== id);
-            saveData();
-            renderStock();
-            renderGoals();
-            renderHistory();
-            showToast('Registro excluído!');
-        }
-
-        // CATÁLOGO DE ITENS
-        function renderCatalogSelects() {
-            const selects = [document.getElementById('itemSelect'), document.getElementById('goalItemSelect')];
-            selects.forEach(select => {
-                if(!select) return;
-                select.innerHTML = '';
-                catalog.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item;
-                    opt.textContent = item;
-                    select.appendChild(opt);
-                });
-            });
-        }
-
-        function openCatalogModal() {
-            renderCatalogList();
-            document.getElementById('catalogModal').classList.remove('hidden');
-        }
-
-        function closeCatalogModal() {
-            document.getElementById('catalogModal').classList.add('hidden');
-        }
-
-        function renderCatalogList() {
-            const container = document.getElementById('catalogList');
+            const container = document.getElementById('stockCards');
             container.innerHTML = '';
-            
-            catalog.forEach((item, index) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'flex items-center justify-between p-2 bg-slate-900 border border-slate-800 rounded-lg text-xs';
-                itemDiv.innerHTML = `
-                    <span class="font-medium text-slate-200">${item}</span>
-                    <button onclick="removeCatalogItem(${index})" class="text-slate-500 hover:text-red-400">
-                        <i data-lucide="x-circle" class="w-4 h-4"></i>
-                    </button>
+            for (let [item, qty] of Object.entries(inventory)) {
+                container.innerHTML += `
+                    <div class="bg-cardbg border border-slate-700 p-4 rounded-xl flex items-center justify-between shadow">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-semibold">Item</p>
+                            <h3 class="text-base font-bold text-slate-100">${item}</h3>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xl font-extrabold text-emerald-400">${qty}</span>
+                            <p class="text-[10px] text-slate-500 uppercase">Unidades</p>
+                        </div>
+                    </div>
                 `;
-                container.appendChild(itemDiv);
-            });
-            lucide.createIcons();
+            }
         }
 
-        function addNewCatalogItem() {
-            const input = document.getElementById('newItemInput');
-            const name = input.value.trim();
-
-            if (!name) return;
-
-            if (catalog.some(i => i.toLowerCase() === name.toLowerCase())) {
-                showToast('Este item já existe no catálogo.', true);
+        // RENDERIZAR LOGS
+        function renderLogs() {
+            const tbody = document.getElementById('logsTableBody');
+            tbody.innerHTML = '';
+            if(logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Nenhum registro encontrado.</td></tr>`;
                 return;
             }
-
-            catalog.push(name);
-            input.value = '';
-            saveData();
-            renderCatalogSelects();
-            renderCatalogList();
-            renderStock();
-            showToast('Novo item cadastrado!');
-        }
-
-        function removeCatalogItem(index) {
-            catalog.splice(index, 1);
-            saveData();
-            renderCatalogSelects();
-            renderCatalogList();
-            renderStock();
-            showToast('Item removido do catálogo.');
-        }
-
-        // VISUALIZAÇÃO DE FOTO
-        function openImageModal(imgSrc) {
-            document.getElementById('modalImg').src = imgSrc;
-            document.getElementById('imageModal').classList.remove('hidden');
-        }
-
-        function closeImageModal() {
-            document.getElementById('imageModal').classList.add('hidden');
-        }
-
-        // EXPORTAR CSV
-        function exportData() {
-            if (logs.length === 0) {
-                showToast('Sem registros para exportar.', true);
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Data/Hora;Membro;Item;Operacao;Quantidade\n";
-
             logs.forEach(log => {
-                const op = log.operation === 'ENTRY' ? 'Entrada' : 'Saida';
-                csvContent += `"${log.timestamp}";"${log.member}";"${log.item}";"${op}";${log.quantity}\n`;
+                const badgeColor = log.type === 'entrada' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/50">
+                        <td class="p-3 text-xs text-slate-400">${log.date}</td>
+                        <td class="p-3 font-semibold text-slate-200">${log.member}</td>
+                        <td class="p-3">${log.item}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] border font-bold uppercase ${badgeColor}">${log.type}</span></td>
+                        <td class="p-3 font-bold text-slate-100">${log.qty}</td>
+                        <td class="p-3">
+                            <img src="${log.photo}" onclick="openPhotoModal('${log.photo}')" class="w-10 h-10 object-cover rounded cursor-pointer hover:opacity-80 border border-slate-700" title="Clique para ampliar">
+                        </td>
+                    </tr>
+                `;
             });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `farm_faccao_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
 
-        // RESETAR HISTÓRICO
-        function clearHistory() {
-            if (confirm("Deseja apagar TODO o histórico? Isso irá zerar o estoque e o progresso das metas.")) {
-                logs = [];
-                saveData();
-                renderStock();
-                renderGoals();
-                renderHistory();
-                showToast('Histórico resetado!');
+        // RENDERIZAR METAS E SOMA AUTOMÁTICA DOS 3 PRODUTOS
+        function renderGoals() {
+            const container = document.getElementById('goalsListContainer');
+            container.innerHTML = '';
+
+            // Calcula o total farmado por membro somando os 3 itens
+            let memberTotals = {};
+            logs.forEach(log => {
+                if (log.type === 'entrada') {
+                    memberTotals[log.member] = (memberTotals[log.member] || 0) + log.qty;
+                }
+            });
+
+            if (Object.keys(goals).length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Nenhuma meta definida pelo gerente ainda.</p>`;
+                return;
+            }
+
+            for (let [member, target] of Object.entries(goals)) {
+                const current = memberTotals[member] || 0;
+                let percent = Math.min(100, Math.round((current / target) * 100));
+                let barColor = percent >= 100 ? 'bg-emerald-500' : 'bg-amber-500';
+                let statusText = percent >= 100 ? '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-check"></i> Concluída</span>' : `${percent}%`;
+
+                container.innerHTML += `
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-200">${member}</span>
+                            <span class="text-slate-400">${current} / ${target} un. (${statusText})</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                            <div class="${barColor} h-2.5 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
             }
         }
 
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        // MODAL FOTO
+        function openPhotoModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('photoModal').classList.remove('hidden');
+            document.getElementById('photoModal').classList.add('flex');
+        }
+        function closePhotoModal() {
+            document.getElementById('photoModal').classList.add('hidden');
+            document.getElementById('photoModal').classList.remove('flex');
         }
     </script>
 </body>
