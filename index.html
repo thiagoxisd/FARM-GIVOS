@@ -3,63 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>É OS GIVO - Gerenciador de Farm</title>
+    <title>Gerenciador de Farm - Facção GTA RP</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        accent: '#10b981',
+                        accenthover: '#059669'
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .neon-border {
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
-            border: 1px solid rgba(0, 242, 254, 0.4);
-        }
-        .neon-text {
-            text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
-        }
-    </style>
 </head>
-<body class="bg-[#090d16] text-slate-100 min-h-screen font-sans antialiased pb-12">
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased pb-12">
 
-    <!-- TELA DE LOGIN -->
-    <div id="loginScreen" class="fixed inset-0 bg-[#060910] z-50 flex items-center justify-center p-4">
-        <div class="bg-[#111827] neon-border p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-6 text-center">
-            
-            <div class="space-y-3">
-                <div class="w-32 h-32 mx-auto rounded-2xl overflow-hidden border-2 border-cyan-500/50 shadow-lg shadow-cyan-950 bg-black flex items-center justify-center">
-                    <img src="https://media.discordapp.net/attachments/1556827955873972225/1569869452420325517/398a0706-2ebf-40e9-8f73-1c01685626bc.jpg?ex=6af5065c&is=6af3b4dc&hm=33eceadc84439972fbb0fd90e9ddb399fcf47107a204792cc62a511c5886ed87&=&format=webp&width=640&height=640" alt="É Os Givo Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://images.vexels.com/content/users/preview/200091/11f81d1136b69b35061612a454d60d05.png';">
+    <!-- TELA DE LOGIN SIMPLES (APENAS ID OU SENHA MASTER) -->
+    <div id="loginScreen" class="fixed inset-0 bg-darkbg/95 z-50 flex items-center justify-center p-4">
+        <div class="bg-cardbg border border-slate-700 p-8 rounded-2xl shadow-2xl max-w-sm w-full space-y-6">
+            <div class="text-center">
+                <div class="bg-emerald-500/10 text-emerald-400 w-16 h-16 mx-auto rounded-2xl flex items-center justify-center border border-emerald-500/20 mb-3">
+                    <i class="fa-solid fa-id-badge text-3xl"></i>
                 </div>
-                <h1 class="text-xl font-black uppercase tracking-wider text-white neon-text">É OS GIVO</h1>
-                <p class="text-xs text-cyan-400 font-semibold tracking-widest uppercase">Controle de Farm & Baú</p>
+                <h1 class="text-xl font-bold">FARM GIVOS</h1>
+                <p class="text-xs text-slate-400 mt-1">Digite seu ID / Passaporte para entrar</p>
             </div>
 
-            <div class="space-y-4 pt-2">
+            <form id="loginForm" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-cyan-400 uppercase mb-1.5">Seu ID ou Senha Master</label>
-                    <input type="text" id="loginPassport" placeholder="Ex: 12" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 text-center font-bold tracking-widest">
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Passaporte / ID</label>
+                    <input type="text" id="loginPassport" required placeholder="Ex: 12" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-center font-bold tracking-wider">
                 </div>
-                <button type="button" onclick="fazerLogin()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black py-3 px-4 rounded-xl text-sm transition uppercase tracking-wider cursor-pointer shadow-lg shadow-cyan-900/50">
-                    Acessar Painel
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30 cursor-pointer">
+                    Acessar Sistema
+                </button>
+            </form>
+            <div class="text-center">
+                <button type="button" onclick="hardResetSystem()" class="text-[10px] text-slate-500 hover:text-red-400 cursor-pointer">
+                    <i class="fa-solid fa-rotate"></i> Limpar cache do sistema
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- HEADER -->
-    <header class="bg-[#111827] border-b border-cyan-900/40 shadow-xl sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+    <!-- HEADER PRINCIPAL -->
+    <header class="bg-cardbg border-b border-slate-700 shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl overflow-hidden border border-cyan-500/40 bg-black flex items-center justify-center">
-                    <img src="https://media.discordapp.net/attachments/1556827955873972225/1569869452420325517/398a0706-2ebf-40e9-8f73-1c01685626bc.jpg?ex=6af5065c&is=6af3b4dc&hm=33eceadc84439972fbb0fd90e9ddb399fcf47107a204792cc62a511c5886ed87&=&format=webp&width=640&height=640" class="w-full h-full object-cover">
+                <div class="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl border border-emerald-500/20">
+                    <i class="fa-solid fa-boxes-stacked text-2xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-base font-black tracking-wider uppercase text-white">É OS GIVO</h1>
-                    <p class="text-xs text-slate-400">Operador: <span id="userSessionBadge" class="text-cyan-400 font-bold"></span></p>
+                    <h1 class="text-xl font-bold tracking-wide">FARM GIVOS</h1>
+                    <p class="text-xs text-slate-400">Logado como: <span id="userSessionBadge" class="text-emerald-400 font-semibold"></span></p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
-                <div id="managerIndicator" class="hidden items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl text-amber-400 text-xs font-extrabold uppercase">
-                    <i class="fa-solid fa-crown"></i> Gerente
+                <div id="managerIndicator" class="hidden items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg text-amber-400 text-xs font-bold">
+                    <i class="fa-solid fa-crown"></i> Modo Gerente Ativo
                 </div>
-                <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
+                <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">
                     <i class="fa-solid fa-right-from-bracket"></i> Sair
                 </button>
             </div>
@@ -68,86 +77,412 @@
 
     <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
 
-        <!-- PAINEL DO GERENTE -->
-        <section id="managerPanel" class="bg-[#111827] neon-border p-6 rounded-2xl shadow-xl hidden space-y-4">
-            <h2 class="text-base font-black text-amber-400 uppercase tracking-wide border-b border-slate-800 pb-2 flex items-center gap-2">
-                <i class="fa-solid fa-user-shield"></i> Painel de Controle do Gerente
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-[#060910] p-4 rounded-xl border border-slate-800 space-y-3">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase">Definir Meta Semanal por ID</h3>
-                    <input type="text" id="goalPassportInput" placeholder="ID do Membro (Ex: 12)" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold">
-                    <input type="number" id="goalTargetValue" placeholder="Quantidade Meta (Ex: 1500)" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold">
-                    <div class="flex gap-2">
-                        <button onclick="salvarMeta()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-lg text-xs uppercase cursor-pointer">Salvar Meta</button>
-                        <button onclick="resetarSemana()" class="bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-2 px-3 rounded-lg text-xs cursor-pointer">Resetar Semana</button>
-                    </div>
+        <!-- PAINEL RESTRITO DO GERENTE -->
+        <section id="managerPanel" class="bg-cardbg p-6 rounded-2xl border border-amber-500/30 shadow-xl hidden space-y-6">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-700">
+                <h2 class="text-lg font-bold flex items-center gap-2 text-amber-400">
+                    <i class="fa-solid fa-user-shield"></i> Painel de Controle do Gerente
+                </h2>
+                <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-md border border-amber-500/20 font-medium">Área Restrita</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Definir Meta -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold text-slate-300">Definir Meta Semanal por ID</h3>
+                    <form id="goalForm" class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">ID do Membro</label>
+                            <input type="text" id="goalPassportInput" required placeholder="Ex: 12" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">Quantidade Meta (Soma dos 3 itens)</label>
+                            <input type="number" id="goalTargetValue" min="1" required placeholder="Ex: 1500" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2 px-3 rounded-lg text-xs transition cursor-pointer">
+                                Salvar Meta
+                            </button>
+                            <button type="button" onclick="resetAllGoalsAndLogs()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-2 px-3 rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer">
+                                <i class="fa-solid fa-rotate-right"></i> Resetar Semana
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="bg-[#060910] p-4 rounded-xl border border-slate-800 space-y-2 flex flex-col">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase">IDs Ativos</h3>
-                    <div id="activeIdsList" class="text-xs text-cyan-300 space-y-1 max-h-[100px] overflow-y-auto font-bold"></div>
+
+                <!-- Resumo dos IDs Ativos -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold text-slate-300">IDs que já registraram farm</h3>
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3 max-h-[160px] overflow-y-auto divide-y divide-slate-800" id="activeIdsList">
+                        <!-- Preenchido via JS -->
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- ESTOQUE -->
+        <!-- DASHBOARD DE ESTOQUE -->
         <section>
-            <h2 class="text-base font-bold text-slate-200 uppercase tracking-wide mb-3 flex items-center gap-2">
-                <i class="fa-solid fa-warehouse text-cyan-400"></i> Estoque Atual no Baú
-            </h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold flex items-center gap-2 text-slate-200">
+                    <i class="fa-solid fa-chart-pie text-emerald-400"></i> Estoque Atual no Baú
+                </h2>
+                <span class="text-xs text-slate-400 bg-cardbg px-3 py-1 rounded-full border border-slate-700">Atualizado em tempo real</span>
+            </div>
             <div id="stockCards" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
         </section>
 
         <!-- FORMULÁRIO E METAS -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <section class="lg:col-span-1 bg-[#111827] neon-border p-6 rounded-2xl shadow-xl space-y-4">
-                <h2 class="text-base font-bold text-cyan-400 uppercase tracking-wide border-b border-slate-800 pb-2 flex items-center gap-2">
+            
+            <!-- REGISTRAR FARM -->
+            <section class="lg:col-span-1 bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
                     <i class="fa-solid fa-circle-plus"></i> Registrar Movimentação
                 </h2>
                 
-                <div class="space-y-3">
+                <form id="farmForm" class="space-y-4">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Seu ID</label>
-                        <input type="text" id="memberName" readonly class="w-full bg-[#060910] border border-slate-800 rounded-xl px-3 py-2 text-sm text-cyan-400 font-black cursor-not-allowed">
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Seu ID (Passaporte)</label>
+                        <input type="text" id="memberName" readonly class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-400 cursor-not-allowed font-bold">
                     </div>
+
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Item</label>
-                        <select id="itemSelect" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold">
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Item</label>
+                        <select id="itemSelect" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                             <option value="Flor de Cannabis">Flor de Cannabis</option>
                             <option value="Thinner">Thinner</option>
                             <option value="Quetamina">Quetamina</option>
                         </select>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Operação</label>
-                            <select id="actionType" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold">
+                            <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Tipo</label>
+                            <select id="actionType" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                                 <option value="entrada">Entrada (+)</option>
                                 <option value="saida">Saída (-)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Qtd</label>
-                            <input type="number" id="itemQuantity" min="1" placeholder="Ex: 100" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold">
+                            <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Quantidade</label>
+                            <input type="number" id="itemQuantity" min="1" required placeholder="Ex: 100" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
+
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Print do Baú (Obrigatório)</label>
-                        <input type="file" id="bauPhoto" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-cyan-500/10 file:text-cyan-400 cursor-pointer bg-[#060910] border border-slate-800 rounded-xl font-bold">
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Print / Foto do Baú <span class="text-red-400">*Obrigatório</span></label>
+                        <input type="file" id="bauPhoto" accept="image/*" required class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-500/10 file:text-emerald-400 hover:file:bg-emerald-500/20 cursor-pointer">
                     </div>
-                    <button onclick="salvarFarm()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg shadow-cyan-900/40">
-                        Salvar Registro
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-check"></i> Salvar Registro
                     </button>
+                </form>
+            </section>
+
+            <!-- ACOMPANHAMENTO DE METAS -->
+            <section class="lg:col-span-2 bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
+                    <i class="fa-solid fa-bullseye text-emerald-400"></i> Progresso das Metas por ID
+                </h2>
+                <div class="space-y-4 flex-1 overflow-y-auto max-h-[350px]" id="goalsListContainer">
+                    <!-- Preenchido via JS -->
                 </div>
             </section>
 
-            <section class="lg:col-span-2 bg-[#111827] neon-border p-6 rounded-2xl shadow-xl flex flex-col">
-                <h2 class="text-base font-bold text-slate-200 uppercase tracking-wide border-b border-slate-800 pb-2 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-bullseye text-cyan-400"></i> Progresso das Metas Semanais
-                </h2>
-                <div class="space-y-3 flex-1 overflow-y-auto max-h-[320px]" id="goalsListContainer"></div>
-            </section>
         </div>
 
-        <!-- HISTÓRICO -->
-        <section class="
+        <!-- HISTÓRICO DE MOVIMENTAÇÕES -->
+        <section class="bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
+                <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i> Histórico de Registros
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 border-b border-slate-700">
+                        <tr>
+                            <th class="p-3">Data/Hora</th>
+                            <th class="p-3">ID / Passaporte</th>
+                            <th class="p-3">Item</th>
+                            <th class="p-3">Ação</th>
+                            <th class="p-3">Qtd</th>
+                            <th class="p-3">Foto do Baú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody" class="divide-y divide-slate-800">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE VISUALIZAÇÃO DE FOTO -->
+    <div id="photoModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-3xl w-full bg-cardbg rounded-xl border border-slate-700 p-2">
+            <button onclick="closePhotoModal()" class="absolute -top-3 -right-3 bg-red-600 text-white w-8 h-8 rounded-full font-bold shadow-lg flex items-center justify-center hover:bg-red-500 cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="modalImage" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-lg">
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CONTROLE -->
+    <script>
+        const MASTER_PASSWORD = "488457@";
+        let currentUser = JSON.parse(localStorage.getItem('givos_user')) || null;
+
+        const loginScreen = document.getElementById('loginScreen');
+        const loginForm = document.getElementById('loginForm');
+        const userSessionBadge = document.getElementById('userSessionBadge');
+        const managerIndicator = document.getElementById('managerIndicator');
+        const managerPanel = document.getElementById('managerPanel');
+        const memberNameInput = document.getElementById('memberName');
+
+        let inventory = JSON.parse(localStorage.getItem('givos_stock')) || { "Flor de Cannabis": 0, "Thinner": 0, "Quetamina": 0 };
+        let logs = JSON.parse(localStorage.getItem('givos_logs')) || [];
+        let goals = JSON.parse(localStorage.getItem('givos_goals')) || {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (currentUser) {
+                initApp();
+            }
+        });
+
+        // LOGIN POR ID OU SENHA MASTER
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const inputVal = document.getElementById('loginPassport').value.trim();
+
+            if (inputVal === MASTER_PASSWORD) {
+                currentUser = { name: "Gerente (Admin)", id: "MASTER", isManager: true };
+            } else if (inputVal !== "") {
+                currentUser = { name: `ID [${inputVal}]`, id: inputVal, isManager: false };
+            } else {
+                alert("Digite um ID válido.");
+                return;
+            }
+
+            localStorage.setItem('givos_user', JSON.stringify(currentUser));
+            initApp();
+        });
+
+        function logout() {
+            localStorage.removeItem('givos_user');
+            location.reload();
+        }
+
+        function hardResetSystem() {
+            if(confirm("Deseja limpar os dados do navegador?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function initApp() {
+            loginScreen.classList.add('hidden');
+            userSessionBadge.textContent = currentUser.name;
+            memberNameInput.value = currentUser.name;
+
+            if (currentUser.isManager) {
+                managerIndicator.classList.remove('hidden');
+                managerIndicator.classList.add('flex');
+                managerPanel.classList.remove('hidden');
+                renderActiveIds();
+            }
+
+            renderStock();
+            renderLogs();
+            renderGoals();
+        }
+
+        function renderActiveIds() {
+            const container = document.getElementById('activeIdsList');
+            container.innerHTML = '';
+            
+            // Pega IDs únicos que já registraram farm
+            let activeIds = [...new Set(logs.map(l => l.member))];
+            
+            if (activeIds.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 py-2">Nenhum ID registrado ainda.</p>`;
+                return;
+            }
+
+            activeIds.forEach(idName => {
+                container.innerHTML += `
+                    <div class="flex justify-between items-center py-1.5 text-xs">
+                        <span class="font-bold text-slate-200">${idName}</span>
+                    </div>
+                `;
+            });
+        }
+
+        // REGISTRAR FARM
+        document.getElementById('farmForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const item = document.getElementById('itemSelect').value;
+            const type = document.getElementById('actionType').value;
+            const qty = parseInt(document.getElementById('itemQuantity').value);
+            const photoInput = document.getElementById('bauPhoto');
+
+            if(photoInput.files && photoInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoUrl = e.target.result;
+
+                    if (type === 'entrada') {
+                        inventory[item] = (inventory[item] || 0) + qty;
+                    } else {
+                        inventory[item] = Math.max(0, (inventory[item] || 0) - qty);
+                    }
+
+                    const newLog = {
+                        date: new Date().toLocaleString('pt-BR'),
+                        member: currentUser.name,
+                        item,
+                        type,
+                        qty,
+                        photo: photoUrl
+                    };
+                    logs.unshift(newLog);
+
+                    saveAndRefresh();
+                    document.getElementById('farmForm').reset();
+                    memberNameInput.value = currentUser.name;
+                    alert("Movimentação registrada com sucesso!");
+                }
+                reader.readAsDataURL(photoInput.files[0]);
+            }
+        });
+
+        // DEFINIR META
+        document.getElementById('goalForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const targetId = document.getElementById('goalPassportInput').value.trim();
+            const targetVal = parseInt(document.getElementById('goalTargetValue').value);
+            const memberKey = `ID [${targetId}]`;
+
+            goals[memberKey] = targetVal;
+            localStorage.setItem('givos_goals', JSON.stringify(goals));
+            renderGoals();
+            document.getElementById('goalForm').reset();
+            alert(`Meta definida para o ID [${targetId}] com sucesso!`);
+        });
+
+        function resetAllGoalsAndLogs() {
+            if(confirm("Tem certeza que deseja resetar a semana? Isso apaga todos os registros de farm, fotos e zera as metas!")) {
+                localStorage.removeItem('givos_logs');
+                localStorage.removeItem('givos_goals');
+                inventory = { "Flor de Cannabis": 0, "Thinner": 0, "Quetamina": 0 };
+                localStorage.setItem('givos_stock', JSON.stringify(inventory));
+                logs = [];
+                goals = {};
+                renderStock();
+                renderLogs();
+                renderGoals();
+                alert("Semana resetada com sucesso!");
+            }
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('givos_stock', JSON.stringify(inventory));
+            localStorage.setItem('givos_logs', JSON.stringify(logs));
+            localStorage.setItem('givos_goals', JSON.stringify(goals));
+            renderStock();
+            renderLogs();
+            renderGoals();
+            if(currentUser.isManager) renderActiveIds();
+        }
+
+        function renderStock() {
+            const container = document.getElementById('stockCards');
+            container.innerHTML = '';
+            for (let [item, qty] of Object.entries(inventory)) {
+                container.innerHTML += `
+                    <div class="bg-cardbg border border-slate-700 p-4 rounded-xl flex items-center justify-between shadow">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-semibold">Item</p>
+                            <h3 class="text-base font-bold text-slate-100">${item}</h3>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xl font-extrabold text-emerald-400">${qty}</span>
+                            <p class="text-[10px] text-slate-500 uppercase">Unidades</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderLogs() {
+            const tbody = document.getElementById('logsTableBody');
+            tbody.innerHTML = '';
+            if(logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Nenhum registro encontrado.</td></tr>`;
+                return;
+            }
+            logs.forEach(log => {
+                const badgeColor = log.type === 'entrada' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/50">
+                        <td class="p-3 text-xs text-slate-400">${log.date}</td>
+                        <td class="p-3 font-semibold text-slate-200">${log.member}</td>
+                        <td class="p-3">${log.item}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] border font-bold uppercase ${badgeColor}">${log.type}</span></td>
+                        <td class="p-3 font-bold text-slate-100">${log.qty}</td>
+                        <td class="p-3">
+                            <img src="${log.photo}" onclick="openPhotoModal('${log.photo}')" class="w-10 h-10 object-cover rounded cursor-pointer hover:opacity-80 border border-slate-700" title="Clique para ampliar">
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderGoals() {
+            const container = document.getElementById('goalsListContainer');
+            container.innerHTML = '';
+
+            let memberTotals = {};
+            logs.forEach(log => {
+                if (log.type === 'entrada') {
+                    memberTotals[log.member] = (memberTotals[log.member] || 0) + log.qty;
+                }
+            });
+
+            if (Object.keys(goals).length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Nenhuma meta definida pelo gerente ainda.</p>`;
+                return;
+            }
+
+            for (let [member, target] of Object.entries(goals)) {
+                const current = memberTotals[member] || 0;
+                let percent = Math.min(100, Math.round((current / target) * 100));
+                let barColor = percent >= 100 ? 'bg-emerald-500' : 'bg-amber-500';
+                let statusText = percent >= 100 ? '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-check"></i> Concluída</span>' : `${percent}%`;
+
+                container.innerHTML += `
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-200">${member}</span>
+                            <span class="text-slate-400">${current} / ${target} un. (${statusText})</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                            <div class="${barColor} h-2.5 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function openPhotoModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('photoModal').classList.remove('hidden');
+            document.getElementById('photoModal').classList.add('flex');
+        }
+        function closePhotoModal() {
+            document.getElementById('photoModal').classList.add('hidden');
+            document.getElementById('photoModal').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>
