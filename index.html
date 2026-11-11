@@ -180,27 +180,38 @@
         </div>
     </div>
 
-    <!-- SCRIPT BLINDADO E CORRIGIDO -->
+    <!-- SCRIPT BLINDADO -->
     <script>
         const MASTER_PASSWORD = "488457@";
         
         let currentUser = null;
+        let inventory = { "Flor de Cannabis": 0, "Thinner": 0, "Quetamina": 0 };
+        let logs = [];
+        let goals = {};
+
         try {
             currentUser = JSON.parse(localStorage.getItem('givos_user'));
+            inventory = JSON.parse(localStorage.getItem('givos_stock')) || inventory;
+            logs = JSON.parse(localStorage.getItem('givos_logs')) || [];
+            goals = JSON.parse(localStorage.getItem('givos_goals')) || {};
         } catch(e) {
             currentUser = null;
         }
 
-        let inventory = JSON.parse(localStorage.getItem('givos_stock')) || { "Flor de Cannabis": 0, "Thinner": 0, "Quetamina": 0 };
-        let logs = JSON.parse(localStorage.getItem('givos_logs')) || [];
-        let goals = JSON.parse(localStorage.getItem('givos_goals')) || {};
+        // Executa imediatamente para garantir exibição correta
+        if (currentUser && currentUser.id) {
+            document.addEventListener("DOMContentLoaded", function() {
+                const screen = document.getElementById('loginScreen');
+                if(screen) screen.style.display = 'none';
+                iniciarSistema();
+            });
+        }
 
         window.onload = function() {
             if (currentUser && currentUser.id) {
-                document.getElementById('loginScreen').style.display = 'none';
+                const screen = document.getElementById('loginScreen');
+                if(screen) screen.style.display = 'none';
                 iniciarSistema();
-            } else {
-                document.getElementById('loginScreen').style.display = 'flex';
             }
 
             const inputField = document.getElementById('loginPassport');
@@ -233,7 +244,8 @@
                 localStorage.setItem('givos_user', JSON.stringify(currentUser));
             } catch(err) {}
 
-            document.getElementById('loginScreen').style.display = 'none';
+            const screen = document.getElementById('loginScreen');
+            if(screen) screen.style.display = 'none';
             iniciarSistema();
         }
 
@@ -265,4 +277,79 @@
             const item = document.getElementById('itemSelect').value;
             const type = document.getElementById('actionType').value;
             const qtyInput = document.getElementById('itemQuantity');
-            const
+            const qty = parseInt(qtyInput.value);
+            const photoInput = document.getElementById('bauPhoto');
+
+            if (!qty || qty <= 0) {
+                alert("Digite uma quantidade válida.");
+                return;
+            }
+
+            if (!photoInput.files || !photoInput.files[0]) {
+                alert("A foto do baú é obrigatória!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoUrl = e.target.result;
+
+                if (type === 'entrada') {
+                    inventory[item] = (inventory[item] || 0) + qty;
+                } else {
+                    inventory[item] = Math.max(0, (inventory[item] || 0) - qty);
+                }
+
+                logs.unshift({
+                    date: new Date().toLocaleString('pt-BR'),
+                    member: currentUser.name,
+                    item, type, qty,
+                    photo: photoUrl
+                });
+
+                salvarEDados();
+                qtyInput.value = '';
+                photoInput.value = '';
+                alert("Movimentação registrada com sucesso!");
+            };
+            reader.onerror = function() {
+                alert("Erro ao ler a imagem. Tente enviar outra foto.");
+            };
+            reader.readAsDataURL(photoInput.files[0]);
+        }
+
+        function salvarMeta() {
+            const targetId = document.getElementById('goalPassportInput').value.trim();
+            const targetVal = parseInt(document.getElementById('goalTargetValue').value);
+
+            if (!targetId || !targetVal) {
+                alert("Preencha o ID e o valor da meta.");
+                return;
+            }
+
+            goals[`ID [${targetId}]`] = targetVal;
+            localStorage.setItem('givos_goals', JSON.stringify(goals));
+            renderGoals();
+            document.getElementById('goalPassportInput').value = '';
+            document.getElementById('goalTargetValue').value = '';
+            alert("Meta salva com sucesso!");
+        }
+
+        function resetarSemana() {
+            if (confirm("Tem certeza que deseja resetar a semana?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function salvarEDados() {
+            try {
+                localStorage.setItem('givos_stock', JSON.stringify(inventory));
+                localStorage.setItem('givos_logs', JSON.stringify(logs));
+                localStorage.setItem('givos_goals', JSON.stringify(goals));
+            } catch(e) {
+                alert("Aviso: O armazenamento local ficou cheio devido ao tamanho das fotos.");
+            }
+            renderStock();
+            renderLogs();
+            renderGoals();
