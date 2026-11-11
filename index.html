@@ -207,6 +207,15 @@
         .shadow-emerald-950\/50 { box-shadow: 0 12px 28px -14px rgba(14, 165, 233, .55) !important; }
 
         /* ---------- tela de login ---------- */
+        /* Cobre a tela inteira: nada do painel aparece antes de entrar. */
+        #entryGate {
+            background-color: #f4fbff !important;
+            background-image:
+                radial-gradient(950px 520px at 8% -12%, #d7f3ff 0%, rgba(215, 243, 255, 0) 62%),
+                radial-gradient(820px 480px at 102% 4%, #e9f9ff 0%, rgba(233, 249, 255, 0) 60%),
+                radial-gradient(700px 700px at 50% 120%, #e6f7ff 0%, rgba(230, 247, 255, 0) 65%) !important;
+            background-attachment: fixed;
+        }
         #entryGate > div {
             box-shadow:
                 0 40px 90px -46px rgba(2, 132, 199, .5),
@@ -549,7 +558,7 @@
     </div>
 
     <!-- TELA INICIAL DE ACESSO: PASSAPORTE OU SENHA MASTER -->
-    <div id="entryGate" class="fixed inset-0 bg-[#080b12] z-[100] flex items-center justify-center p-4">
+    <div id="entryGate" class="fixed inset-0 bg-[#080b12] z-[100] flex items-center justify-center p-4 overflow-y-auto">
         <div class="w-full max-w-md bg-brand-cardBg border border-brand-border rounded-2xl p-7 shadow-2xl">
             <div class="relative w-32 h-32 mx-auto mb-3 flex items-center justify-center">
                 <div class="absolute inset-2 rounded-full bg-sky-300/40 blur-2xl"></div>
