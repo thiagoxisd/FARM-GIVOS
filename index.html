@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .neon-border {
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
             border: 1px solid rgba(0, 242, 254, 0.4);
         }
         .neon-text {
@@ -18,14 +18,14 @@
 </head>
 <body class="bg-[#090d16] text-slate-100 min-h-screen font-sans antialiased pb-12">
 
-    <!-- TELA DE LOGIN COM A SUA LOGO OFICIAL -->
+    <!-- TELA DE LOGIN COM A SUA LOGO DO DISCORD -->
     <div id="loginScreen" class="fixed inset-0 bg-[#060910] z-50 flex items-center justify-center p-4">
         <div class="bg-[#111827] neon-border p-8 rounded-3xl shadow-2xl max-w-sm w-full space-y-6 text-center">
             
-            <!-- LOGO DA FACÇÃO COM FUNDO ESCURO CORRIGIDO -->
+            <!-- LOGO DA FACÇÃO -->
             <div class="space-y-3">
-                <div class="w-36 h-36 mx-auto rounded-2xl overflow-hidden border-2 border-cyan-500/50 shadow-lg shadow-cyan-900/50 bg-[#060910] flex items-center justify-center">
-                    <img src="https://i.imgur.com/2Y45K6g.jpg" alt="É Os Givo Logo" class="w-full h-full object-cover">
+                <div class="w-32 h-32 mx-auto rounded-2xl overflow-hidden border-2 border-cyan-500/50 shadow-lg shadow-cyan-950 bg-black flex items-center justify-center">
+                    <img src="https://media.discordapp.net/attachments/1556827955873972225/1569869452420325517/398a0706-2ebf-40e9-8f73-1c01685626bc.jpg?ex=6af5065c&is=6af3b4dc&hm=33eceadc84439972fbb0fd90e9ddb399fcf47107a204792cc62a511c5886ed87&=&format=webp&width=640&height=640" alt="É Os Givo Logo" class="w-full h-full object-cover">
                 </div>
                 <h1 class="text-xl font-black uppercase tracking-wider text-white neon-text">É OS GIVO</h1>
                 <p class="text-xs text-cyan-400 font-semibold tracking-widest uppercase">Controle de Farm & Baú</p>
@@ -48,7 +48,7 @@
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl overflow-hidden border border-cyan-500/40 bg-black flex items-center justify-center">
-                    <img src="https://i.imgur.com/2Y45K6g.jpg" class="w-full h-full object-cover">
+                    <img src="https://media.discordapp.net/attachments/1556827955873972225/1569869452420325517/398a0706-2ebf-40e9-8f73-1c01685626bc.jpg?ex=6af5065c&is=6af3b4dc&hm=33eceadc84439972fbb0fd90e9ddb399fcf47107a204792cc62a511c5886ed87&=&format=webp&width=640&height=640" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <h1 class="text-base font-black tracking-wider uppercase text-white">É OS GIVO</h1>
@@ -348,51 +348,3 @@
         }
 
         function renderGoals() {
-            const container = document.getElementById('goalsListContainer');
-            container.innerHTML = '';
-            let totals = {};
-            logs.forEach(l => { if (l.type === 'entrada') totals[l.member] = (totals[l.member] || 0) + l.qty; });
-
-            if (Object.keys(goals).length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Nenhuma meta definida.</p>`;
-                return;
-            }
-
-            for (let [member, target] of Object.entries(goals)) {
-                let current = totals[member] || 0;
-                let percent = Math.min(100, Math.round((current / target) * 100));
-                container.innerHTML += `
-                    <div class="bg-[#060910] p-3 rounded-xl border border-slate-800 space-y-1.5">
-                        <div class="flex justify-between text-xs font-bold text-white">
-                            <span>${member}</span>
-                            <span>${current} / ${target} (${percent}%)</span>
-                        </div>
-                        <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden">
-                            <div class="bg-gradient-to-r from-cyan-600 to-blue-500 h-full rounded-full" style="width: ${percent}%"></div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function renderActiveIds() {
-            const container = document.getElementById('activeIdsList');
-            container.innerHTML = '';
-            let ids = [...new Set(logs.map(l => l.member))];
-            if (ids.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500">Nenhum ID registrado.</p>`;
-                return;
-            }
-            ids.forEach(id => { container.innerHTML += `<div>• ${id}</div>`; });
-        }
-
-        function openPhotoModal(src) {
-            document.getElementById('modalImage').src = src;
-            document.getElementById('photoModal').style.display = 'flex';
-        }
-        function closePhotoModal() {
-            document.getElementById('photoModal').style.display = 'none';
-        }
-    </script>
-</body>
-</html>
