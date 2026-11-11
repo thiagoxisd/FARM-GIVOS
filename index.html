@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>É OS GIVO - Gerenciador de Farm</title>
+    <title>Painel de Gestão de Farm & Metas - GTA RP</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,7 +13,7 @@
                 extend: {
                     colors: {
                         brand: {
-                            500: '#10b981',
+                            500: '#10b981', // Emerald / Neon Green
                             600: '#059669',
                             darkBg: '#080b12',
                             cardBg: '#0f172a',
@@ -25,17 +25,30 @@
             }
         }
     </script>
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #080b12; color: #f1f5f9; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #080b12; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080b12;
+            color: #f1f5f9;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080b12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
@@ -44,26 +57,26 @@
     <header class="bg-brand-cardBg border-b border-brand-border sticky top-0 z-30 shadow-2xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl overflow-hidden border border-emerald-500/40 bg-black flex items-center justify-center">
-                    <img src="https://media.discordapp.net/attachments/1556827955873972225/1569869452420325517/398a0706-2ebf-40e9-8f73-1c01685626bc.jpg?ex=6af5065c&is=6af3b4dc&hm=33eceadc84439972fbb0fd90e9ddb399fcf47107a204792cc62a511c5886ed87&=&format=webp&width=640&height=640" class="w-full h-full object-cover">
+                <div class="bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/30">
+                    <i data-lucide="shield-check" class="w-6 h-6 text-emerald-400"></i>
                 </div>
                 <div>
                     <h1 class="text-base font-extrabold text-white tracking-wider uppercase flex items-center gap-2">
-                        É OS GIVO <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">FARM & BAÚ</span>
+                        Painel de Farm <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">FACÇÃO RP</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Controle Compartilhado em Nuvem</p>
+                    <p class="text-xs text-slate-400">Controle do Baú & Metas Semanais da Tropa</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
                 <span id="sessionBadge" class="text-xs text-emerald-300 font-semibold hidden sm:inline"></span>
-                <button id="exportBtn" onclick="managerAction(exportData)" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition cursor-pointer">
+                <button id="exportBtn" onclick="managerAction(exportData)" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition">
                     <i data-lucide="download" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar CSV</span>
                 </button>
-                <button id="clearHistoryBtn" onclick="managerAction(clearHistory)" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-xs font-semibold rounded-lg border border-red-800/50 text-red-300 transition cursor-pointer">
+                <button id="clearHistoryBtn" onclick="managerAction(clearHistory)" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-xs font-semibold rounded-lg border border-red-800/50 text-red-300 transition">
                     <i data-lucide="trash-2" class="w-4 h-4"></i><span class="hidden sm:inline">Resetar Histórico</span>
                 </button>
-                <button id="logoutBtn" onclick="logoutSession()" class="hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition cursor-pointer">
+                <button id="logoutBtn" onclick="logoutSession()" class="hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition">
                     Sair
                 </button>
             </div>
@@ -80,16 +93,18 @@
                     <i data-lucide="box" class="w-4 h-4 text-emerald-400"></i>
                     Estoque Geral no Baú
                 </h2>
-                <button id="catalogManagerBtn" onclick="managerAction(openCatalogModal)" class="hidden text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold bg-emerald-950/40 px-3 py-1.5 rounded-lg border border-emerald-800/50 transition cursor-pointer">
+                <button id="catalogManagerBtn" onclick="managerAction(openCatalogModal)" class="hidden text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold bg-emerald-950/40 px-3 py-1.5 rounded-lg border border-emerald-800/50 transition">
                     <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
                     Gerenciar Catálogo
                 </button>
             </div>
 
-            <div id="stockGrid" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+            <div id="stockGrid" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <!-- Cards renderizados dinamicamente -->
+            </div>
         </section>
 
-        <!-- 2. PAINEL DE METAS SEMANAIS (GERÊNCIA) -->
+        <!-- 2. PAINEL DE METAS SEMANAIS DA TROPA (ÁREA DO GERENTE) -->
         <section id="managerGoalsSection" class="hidden bg-brand-cardBg border border-brand-border rounded-xl p-5 shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none"></div>
             <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-brand-border pb-4 mb-5">
@@ -98,26 +113,27 @@
                         <i data-lucide="chart-no-axes-combined" class="w-5 h-5 text-purple-400"></i>
                         Painel exclusivo da gerência
                     </h2>
-                    <p class="text-xs text-slate-400 mt-1">Acompanhe o desempenho de todos os passaportes conectados.</p>
+                    <p class="text-xs text-slate-400 mt-1">A mesma meta semanal será aplicada individualmente a cada item do catálogo para todos os membros cadastrados.</p>
                 </div>
                 <div class="flex flex-wrap items-end gap-2">
                     <div>
                         <label for="globalWeeklyGoalInput" class="block text-[11px] text-slate-400 mb-1">Meta semanal por item</label>
                         <input id="globalWeeklyGoalInput" type="number" min="1" step="1" class="w-40 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white" placeholder="Ex.: 1000">
                     </div>
-                    <button onclick="saveGlobalGoal()" class="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg cursor-pointer">Salvar meta geral</button>
-                    <button onclick="resetWeeklyGoals()" class="px-3 py-2 bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold rounded-lg cursor-pointer">Resetar semana</button>
+                    <button onclick="saveGlobalGoal()" class="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg">Salvar meta geral</button>
+                    <button onclick="resetWeeklyGoals()" class="px-3 py-2 bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold rounded-lg">Resetar semana</button>
                 </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5" id="managerSummary"></div>
             <div class="flex items-center justify-between gap-3 mb-3">
-                <h3 class="text-sm font-bold text-slate-200">Desempenho por passaporte e item</h3>
+                <h3 class="text-sm font-bold text-slate-200">Desempenho por membro e item</h3>
+                <span class="text-[10px] text-slate-500">Percentual calculado sobre a meta geral</span>
             </div>
             <div class="overflow-x-auto rounded-lg border border-slate-800">
                 <table class="w-full min-w-[720px] text-left text-xs">
                     <thead class="bg-slate-900 text-slate-400">
                         <tr>
-                            <th class="px-3 py-3">Passaporte</th>
+                            <th class="px-3 py-3">Membro / Passaporte</th>
                             <th class="px-3 py-3">Item</th>
                             <th class="px-3 py-3">Entregue</th>
                             <th class="px-3 py-3">Meta</th>
@@ -128,7 +144,7 @@
                     <tbody id="managerReportBody" class="divide-y divide-slate-800 text-slate-300"></tbody>
                 </table>
             </div>
-            <p id="managerReportEmpty" class="hidden text-center text-xs text-slate-500 py-6">Nenhum dado registrado para exibir no relatório.</p>
+            <p id="managerReportEmpty" class="hidden text-center text-xs text-slate-500 py-6">Cadastre membros e defina a meta semanal para gerar o relatório.</p>
         </section>
 
         <!-- 3. FORMULÁRIO DE REGISTRO COM FOTO -->
@@ -138,20 +154,20 @@
                     <i data-lucide="file-plus" class="w-5 h-5 text-emerald-400"></i>
                     Novo Lançamento de Farm (Com foto do Baú)
                 </h2>
-                <p class="text-xs text-slate-400">Envie a quantidade e a foto do print do baú para atualizar o estoque compartilhado.</p>
+                <p class="text-xs text-slate-400">Registre as entradas ou saídas enviando obrigatoriamente a foto da print do baú.</p>
             </div>
 
             <form id="farmForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     
-                    <!-- Passaporte Conectado -->
+                    <!-- Membro -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Passaporte Atual</label>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Membro / Passaporte <span class="text-emerald-400">*</span></label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                                 <i data-lucide="user" class="w-4 h-4"></i>
                             </span>
-                            <input type="text" id="memberName" readonly class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-emerald-400 font-bold opacity-80 cursor-not-allowed">
+                            <input type="text" id="memberName" required readonly placeholder="Identificado pelo passaporte" class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
 
@@ -159,7 +175,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Item do Baú <span class="text-emerald-400">*</span></label>
                         <select id="itemSelect" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
-                            <!-- Preenchido via JS -->
+                            <!-- Opções preenchidas por JS -->
                         </select>
                     </div>
 
@@ -208,7 +224,7 @@
                         <!-- Container do Preview -->
                         <div id="previewContainer" class="hidden relative border border-slate-700 rounded-xl overflow-hidden bg-slate-900 w-24 h-24 shrink-0 shadow-lg">
                             <img id="imagePreview" src="" alt="Preview" class="w-full h-full object-cover">
-                            <button type="button" onclick="removeImagePreview()" class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-500 shadow cursor-pointer">
+                            <button type="button" onclick="removeImagePreview()" class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 hover:bg-red-500 shadow">
                                 <i data-lucide="x" class="w-3 h-3"></i>
                             </button>
                         </div>
@@ -217,7 +233,7 @@
 
                 <!-- SUBMIT -->
                 <div class="flex justify-end pt-2">
-                    <button type="submit" id="submitFarmBtn" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-emerald-950/50 transition flex items-center justify-center gap-2 cursor-pointer">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-emerald-950/50 transition flex items-center justify-center gap-2">
                         <i data-lucide="check-circle-2" class="w-4 h-4"></i>
                         Confirmar & Registrar Farm
                     </button>
@@ -231,16 +247,16 @@
                 <div>
                     <h2 class="text-base font-bold text-white flex items-center gap-2">
                         <i data-lucide="history" class="w-5 h-5 text-emerald-400"></i>
-                        Histórico Compartilhado de Registros
+                        Histórico de Registros (Logs)
                     </h2>
-                    <p class="text-xs text-slate-400">Linha do tempo de todas as movimentações enviadas pela tropa.</p>
+                    <p class="text-xs text-slate-400">Linha do tempo de todas as movimentações e fotos salvas.</p>
                 </div>
 
                 <div class="relative w-full sm:w-64">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                         <i data-lucide="search" class="w-4 h-4"></i>
                     </span>
-                    <input type="text" id="searchInput" oninput="renderHistory()" placeholder="Buscar por passaporte ou item..." class="w-full pl-9 pr-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                    <input type="text" id="searchInput" oninput="renderHistory()" placeholder="Buscar por membro ou item..." class="w-full pl-9 pr-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
                 </div>
             </div>
 
@@ -250,7 +266,7 @@
                     <thead>
                         <tr class="border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
                             <th class="py-3 px-3">Data / Hora</th>
-                            <th class="py-3 px-3">Passaporte</th>
+                            <th class="py-3 px-3">Membro</th>
                             <th class="py-3 px-3">Item</th>
                             <th class="py-3 px-3 text-center">Tipo</th>
                             <th class="py-3 px-3 text-right">Qtd</th>
@@ -258,59 +274,78 @@
                             <th class="py-3 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="historyTableBody" class="divide-y divide-slate-800/80 text-slate-300"></tbody>
+                    <tbody id="historyTableBody" class="divide-y divide-slate-800/80 text-slate-300">
+                        <!-- Renderizado via JS -->
+                    </tbody>
                 </table>
-                <div id="emptyHistoryMsg" class="hidden text-center py-8 text-slate-500 text-xs">Nenhum registro encontrado.</div>
+                
+                <div id="emptyHistoryMsg" class="hidden text-center py-8 text-slate-500 text-xs">
+                    Nenhum registro encontrado.
+                </div>
             </div>
         </section>
 
     </main>
 
-    <!-- MODAL 1: GERENCIAR CATÁLOGO -->
+    <!-- MODAL 1: GERENCIAR CATÁLOGO DE ITENS -->
     <div id="catalogModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-brand-cardBg border border-brand-border rounded-xl max-w-md w-full p-5 shadow-2xl">
             <div class="flex justify-between items-center pb-3 border-b border-slate-800">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="boxes" class="w-4 h-4 text-emerald-400"></i> Catálogo de Itens do Baú
+                    <i data-lucide="boxes" class="w-4 h-4 text-emerald-400"></i>
+                    Catálogo de Itens do Baú
                 </h3>
-                <button onclick="closeCatalogModal()" class="text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeCatalogModal()" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
             </div>
+
             <div class="py-4 space-y-4">
                 <div class="flex gap-2">
                     <input type="text" id="newItemInput" placeholder="Ex: Pacote de C4" class="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
-                    <button onclick="addNewCatalogItem()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold cursor-pointer">Adicionar</button>
+                    <button onclick="addNewCatalogItem()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold">
+                        Adicionar
+                    </button>
                 </div>
-                <div class="max-h-60 overflow-y-auto space-y-2 pr-1" id="catalogList"></div>
+
+                <div class="max-h-60 overflow-y-auto space-y-2 pr-1" id="catalogList">
+                    <!-- Lista dinâmica -->
+                </div>
             </div>
+
             <div class="pt-3 border-t border-slate-800 text-right">
-                <button onclick="closeCatalogModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg font-medium cursor-pointer">Fechar</button>
+                <button onclick="closeCatalogModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg font-medium">
+                    Fechar
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: VISUALIZADOR DA FOTO -->
+    <!-- MODAL 3: VISUALIZADOR DA FOTO -->
     <div id="imageModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center hidden p-4" onclick="closeImageModal()">
         <div class="relative max-w-4xl w-full flex flex-col items-center">
-            <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white hover:text-emerald-400 flex items-center gap-1 text-xs font-bold cursor-pointer">
+            <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white hover:text-emerald-400 flex items-center gap-1 text-xs font-bold">
                 <i data-lucide="x" class="w-5 h-5"></i> Fechar (ESC)
             </button>
             <img id="modalImg" src="" alt="Print do Baú" class="max-h-[85vh] max-w-full rounded-xl border border-slate-700 shadow-2xl object-contain">
         </div>
     </div>
 
-    <!-- TELA DE LOGIN: APENAS PASSAPORTE / SENHA MASTER -->
+    <!-- TELA INICIAL DE ACESSO: PASSAPORTE OU SENHA MASTER -->
     <div id="entryGate" class="fixed inset-0 bg-[#080b12] z-[100] flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-brand-cardBg border border-brand-border rounded-2xl p-7 shadow-2xl">
-            <div class="w-14 h-14 mx-auto mb-4 rounded-2xl overflow-hidden border border-emerald-500/30 flex items-center justify-center bg-black">
-                <img src="https://media.discordapp.net/attachments/1556827955873972225/1569869452420325517/398a0706-2ebf-40e9-8f73-1c01685626bc.jpg?ex=6af5065c&is=6af3b4dc&hm=33eceadc84439972fbb0fd90e9ddb399fcf47107a204792cc62a511c5886ed87&=&format=webp&width=640&height=640" class="w-full h-full object-cover">
+            <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                <i data-lucide="shield-check" class="w-7 h-7 text-emerald-400"></i>
             </div>
-            <h2 class="text-xl font-extrabold text-white text-center">É OS GIVO</h2>
-            <p class="text-xs text-slate-400 text-center mt-2 mb-6">Digite seu passaporte numérico para entrar (ou a senha master).</p>
+            <h2 class="text-xl font-extrabold text-white text-center">Painel de Farm</h2>
+            <p class="text-xs text-slate-400 text-center mt-2 mb-6">Digite seu passaporte numérico para acessar e registrar seu farm.</p>
             <form onsubmit="submitEntry(event)" class="space-y-3">
-                <input id="entryCredential" type="password" inputmode="numeric" autocomplete="off" required placeholder="Passaporte ou Senha Master" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-center text-lg tracking-widest text-white focus:outline-none focus:border-emerald-500">
+                <input id="entryCredential" type="password" inputmode="numeric" autocomplete="off" required placeholder="Passaporte" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-center text-lg tracking-widest text-white focus:outline-none focus:border-emerald-500">
+                <input id="firstRegistrationName" type="text" autocomplete="off" placeholder="Seu nome / apelido (somente no primeiro acesso)" class="hidden w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
                 <p id="entryError" class="hidden text-xs text-red-400 text-center"></p>
-                <button id="entrySubmitBtn" type="submit" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition cursor-pointer">Acessar sistema</button>
+                <button id="entrySubmitBtn" type="submit" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition">Acessar sistema</button>
             </form>
+            <p class="text-[10px] text-slate-500 text-center mt-5">O passaporte identifica seu cadastro. A gerência utiliza uma credencial master.</p>
         </div>
     </div>
 
@@ -320,56 +355,103 @@
         <span id="toastMsg">Operação realizada!</span>
     </div>
 
-    <!-- SCRIPT DO SUPABASE E APLICAÇÃO -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // ==========================================
-        // CREDENCIAIS DO SUPABASE INJETADAS
-        // ==========================================
-        const SUPABASE_URL = 'https://tavmykenkakvjytfrrff.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'sb_publishable_WbHHkNY4FNis2yU9Sq5w6A_dm0KfdE_';
-        
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+        // ITENS PADRÃO SOLICITADOS
         const DEFAULT_ITEMS = ['Flor de Cannabis', 'Thinner', 'Quetamina'];
+        
         let catalog = JSON.parse(localStorage.getItem('gta_farm_catalog_v2')) || DEFAULT_ITEMS;
-        let logs = [];
-        let members = [];
-        let globalWeeklyGoal = 1000;
+        let logs = JSON.parse(localStorage.getItem('gta_farm_logs_v2')) || [];
+        let goals = JSON.parse(localStorage.getItem('gta_farm_goals_v2')) || [];
+        let members = JSON.parse(localStorage.getItem('gta_farm_members_v1')) || [];
+        let globalWeeklyGoal = Number(localStorage.getItem('gta_farm_global_goal_v1')) || 0;
         let currentImageData = null;
         let managerUnlocked = false;
         let currentSession = null;
         let goalResetLogId = Number(localStorage.getItem('gta_farm_goal_reset_id_v2')) || 0;
         const MASTER_PASSWORD = '488457@';
 
-        // CARREGAR DADOS DO SUPABASE AO ABRIR
-        async function loadDataFromSupabase() {
-            try {
-                // Carregar Configurações (Meta)
-                const { data: configData } = await _supabase.from('app_config').select('*');
-                if (configData) {
-                    const goalObj = configData.find(c => c.key === 'global_weekly_goal');
-                    if (goalObj) globalWeeklyGoal = Number(goalObj.value) || 1000;
-                }
+        function submitEntry(event) {
+            event.preventDefault();
+            const credential = document.getElementById('entryCredential').value.trim();
+            const error = document.getElementById('entryError');
+            const nameInput = document.getElementById('firstRegistrationName');
+            error.classList.add('hidden');
 
-                // Carregar Membros
-                const { data: membersData } = await _supabase.from('members').select('*');
-                if (membersData) members = membersData;
+            // A mesma tela reconhece a credencial master sem exibir botão de gerente.
+            if (credential === MASTER_PASSWORD) {
+                managerUnlocked = true;
+                currentSession = { passport: 'MASTER', name: 'Gerência', isManager: true };
+                enterSystem();
+                return;
+            }
 
-                // Carregar Histórico de Logs
-                const { data: logsData } = await _supabase.from('farm_logs').select('*').order('id', { ascending: false });
-                if (logsData) {
-                    logs = logsData.map(l => ({
-                        id: Number(l.id),
-                        timestamp: l.timestamp,
-                        passport: l.passport,
-                        member: `Passaporte [${l.passport}]`, item: l.item, operation: l.operation, quantity: l.quantity, image: l.image })); } } catch (err) { console.error("Erro ao sincronizar com Supabase:", err); showToast("Erro ao conectar com o banco de dados online.", true); } }  async function submitEntry(event) { event.preventDefault(); const credential = document.getElementById('entryCredential').value.trim(); const error = document.getElementById('entryError'); error.classList.add('hidden');  // Verificar Senha Master if (credential === MASTER_PASSWORD) { managerUnlocked = true; currentSession = { passport: 'MASTER', name: 'Gerência', isManager: true }; await loadDataFromSupabase(); enterSystem(); return; }  // Validar passaporte puramente numérico if (!/^\d+$/.test(credential)) { error.textContent = 'Informe apenas números válidos para o passaporte.'; error.classList.remove('hidden'); return; }  // Conectar ao Supabase para verificar/cadastrar passaporte try { showToast("Conectando..."); await loadDataFromSupabase();  let found = members.find(m => String(m.passport) === credential);  // Se o passaporte ainda não existe, cadastra automaticamente na hora! if (!found) { const { error: insertErr } = await _supabase.from('members').insert([{ passport: credential }]); if (insertErr) throw insertErr; members.push({ passport: credential }); }  currentSession = { passport: credential, name: `Passaporte [${credential}]`, isManager: false };
+            if (!/^\d+$/.test(credential)) {
+                error.textContent = 'Informe um passaporte numérico válido.';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            const found = members.find(member => String(member.passport) === credential);
+            if (found) {
+                currentSession = { ...found, isManager: false };
                 managerUnlocked = false;
                 enterSystem();
-                showToast(`Passaporte ${credential} conectado!`); } catch (err) { console.error(err); error.textContent = 'Erro ao registrar passaporte no banco online.'; error.classList.remove('hidden'); } }  async function enterSystem() { document.getElementById('entryGate').classList.add('hidden'); document.getElementById('sessionBadge').textContent = currentSession.isManager ? 'GERÊNCIA MASTER' : `Passaporte: ${currentSession.passport}`;
+                return;
+            }
+
+            // Primeiro acesso: solicitar nome e cadastrar o passaporte único.
+            if (nameInput.classList.contains('hidden')) {
+                nameInput.classList.remove('hidden');
+                nameInput.required = true;
+                nameInput.focus();
+                document.getElementById('entrySubmitBtn').textContent = 'Cadastrar e acessar';
+                error.textContent = 'Passaporte ainda não cadastrado. Informe seu nome para criar o cadastro.';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            const name = nameInput.value.trim();
+            if (!name) {
+                error.textContent = 'Informe seu nome ou apelido para concluir o cadastro.';
+                error.classList.remove('hidden');
+                return;
+            }
+            if (members.some(member => String(member.passport) === credential)) {
+                error.textContent = 'Este passaporte já está cadastrado.';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            const newMember = { passport: credential, name, createdAt: Date.now() };
+            const previousMembers = members;
+            members = [...members, newMember];
+            try {
+                localStorage.setItem('gta_farm_members_v1', JSON.stringify(members));
+                currentSession = { ...newMember, isManager: false };
+                enterSystem();
+                showToast('Cadastro criado com sucesso!');
+            } catch (err) {
+                members = previousMembers;
+                error.textContent = 'Não foi possível salvar o cadastro neste navegador.';
+                error.classList.remove('hidden');
+            }
+        }
+
+        function enterSystem() {
+            document.getElementById('entryGate').classList.add('hidden');
+            document.getElementById('sessionBadge').textContent = currentSession.isManager
+                ? 'GERÊNCIA MASTER'
+                : `${currentSession.name} • Passaporte ${currentSession.passport}`;
             document.getElementById('logoutBtn').classList.remove('hidden');
 
+            // Campo do membro fica vinculado à sessão; ninguém digita o nome a cada farm.
             const memberField = document.getElementById('memberName');
-            memberField.value = currentSession.passport;
+            memberField.value = currentSession.name;
+            memberField.readOnly = true;
+            memberField.classList.add('opacity-70');
+            const memberLabel = memberField.closest('div').parentElement.querySelector('label');
+            if (memberLabel) memberLabel.textContent = 'Membro identificado pela sessão';
 
             if (managerUnlocked) {
                 document.getElementById('managerGoalsSection').classList.remove('hidden');
@@ -392,6 +474,10 @@
             managerUnlocked = false;
             currentSession = null;
             document.getElementById('entryCredential').value = '';
+            document.getElementById('firstRegistrationName').value = '';
+            document.getElementById('firstRegistrationName').classList.add('hidden');
+            document.getElementById('firstRegistrationName').required = false;
+            document.getElementById('entrySubmitBtn').textContent = 'Acessar sistema';
             document.getElementById('sessionBadge').textContent = '';
             document.getElementById('logoutBtn').classList.add('hidden');
             ['exportBtn','clearHistoryBtn','catalogManagerBtn'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -406,35 +492,43 @@
             action();
         }
 
-        async function saveGlobalGoal() {
+        function saveGlobalGoal() {
             if (!managerUnlocked || !currentSession?.isManager) return;
             const value = Number(document.getElementById('globalWeeklyGoalInput').value);
             if (!Number.isSafeInteger(value) || value <= 0) {
-                showToast('Informe uma meta válida.', true);
+                showToast('Informe uma meta semanal inteira maior que zero.', true);
                 return;
             }
+            const oldValue = globalWeeklyGoal;
             globalWeeklyGoal = value;
             try {
-                await _supabase.from('app_config').upsert({ key: 'global_weekly_goal', value: String(value) });
+                localStorage.setItem('gta_farm_global_goal_v1', String(globalWeeklyGoal));
                 renderGoals();
-                showToast(`Meta geral definida: ${value.toLocaleString('pt-BR')}`);
+                showToast(`Meta geral definida: ${value.toLocaleString('pt-BR')} por item.`);
             } catch (err) {
-                showToast('Erro ao salvar meta no Supabase.', true);
+                globalWeeklyGoal = oldValue;
+                showToast('Não foi possível salvar a meta geral.', true);
             }
         }
 
         function resetWeeklyGoals() {
             if (!managerUnlocked || !currentSession?.isManager) return;
-            if (!confirm('Resetar o progresso semanal de todos os passaportes?')) return;
+            if (!confirm('Resetar o progresso semanal de todos os membros e itens? O histórico e o estoque serão mantidos.')) return;
+            const previousReset = goalResetLogId;
             goalResetLogId = Date.now();
-            localStorage.setItem('gta_farm_goal_reset_id_v2', String(goalResetLogId));
-            renderGoals();
-            showToast('Progresso semanal resetado!');
+            try {
+                localStorage.setItem('gta_farm_goal_reset_id_v2', String(goalResetLogId));
+                renderGoals();
+                showToast('Progresso semanal resetado para todos!');
+            } catch (error) {
+                goalResetLogId = previousReset;
+                showToast('Não foi possível salvar o reset semanal.', true);
+            }
         }
 
-        window.onload = async function() {
+        // INICIALIZAÇÃO
+        window.onload = function() {
             lucide.createIcons();
-            await loadDataFromSupabase();
             renderCatalogSelects();
             renderStock();
             renderGoals();
@@ -442,33 +536,66 @@
             document.getElementById('entryCredential').focus();
         };
 
+        function saveData() {
+            // Salva cada conjunto de dados com tratamento de erro explícito.
+            try {
+                localStorage.setItem('gta_farm_catalog_v2', JSON.stringify(catalog));
+                localStorage.setItem('gta_farm_logs_v2', JSON.stringify(logs));
+                localStorage.setItem('gta_farm_goals_v2', JSON.stringify(goals));
+                localStorage.setItem('gta_farm_members_v1', JSON.stringify(members));
+                localStorage.setItem('gta_farm_global_goal_v1', String(globalWeeklyGoal));
+                return true;
+            } catch (error) {
+                console.error('Erro ao salvar dados:', error);
+                showToast('Falha ao salvar: armazenamento do navegador pode estar cheio.', true);
+                return false;
+            }
+        }
+
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toastMsg');
             toastMsg.innerText = message;
-            toast.className = `fixed bottom-4 right-4 ${isError ? 'bg-red-600' : 'bg-emerald-600'} text-white px-4 py-2.5 rounded-lg shadow-xl text-xs font-bold flex items-center gap-2 transition-all duration-300 z-50`;
-            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+            
+            if(isError) {
+                toast.classList.remove('bg-emerald-600');
+                toast.classList.add('bg-red-600');
+            } else {
+                toast.classList.remove('bg-red-600');
+                toast.classList.add('bg-emerald-600');
+            }
+
             toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
         }
 
-        // COMPRESSÃO DE IMAGEM
-        function compressImage(file, maxSize = 800, quality = 0.6) {
+        // FOTO / PREVIEW
+        // Reduz as imagens antes de armazená-las no localStorage.
+        function compressImage(file, maxSize = 1000, quality = 0.65) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onerror = () => reject(new Error('Erro ao ler a imagem.'));
+                reader.onerror = () => reject(new Error('Não foi possível ler a imagem.'));
                 reader.onload = (event) => {
                     const img = new Image();
+                    img.onerror = () => reject(new Error('O arquivo selecionado não é uma imagem válida.'));
                     img.onload = () => {
                         let width = img.width;
                         let height = img.height;
-                        if (width > height && width > maxSize) {
-                            height = Math.round(height * maxSize / width); width = maxSize;
-                        } else if (height > maxSize) {
-                            width = Math.round(width * maxSize / height); height = maxSize;
-                        }
+                        const scale = Math.min(1, maxSize / Math.max(width, height));
+                        width = Math.max(1, Math.round(width * scale));
+                        height = Math.max(1, Math.round(height * scale));
+
                         const canvas = document.createElement('canvas');
-                        canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        canvas.width = width;
+                        canvas.height = height;
+                        const context = canvas.getContext('2d');
+                        if (!context) {
+                            reject(new Error('Não foi possível processar a imagem.'));
+                            return;
+                        }
+                        context.drawImage(img, 0, 0, width, height);
                         resolve(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.src = event.target.result;
@@ -480,14 +607,31 @@
         async function previewImage(event) {
             const file = event.target.files[0];
             if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast('Selecione um arquivo de imagem válido.', true);
+                event.target.value = '';
+                return;
+            }
+
+            // O limite original de 3 MB é mantido para evitar arquivos enormes na entrada.
+            if (file.size > 3 * 1024 * 1024) {
+                showToast('A imagem original deve ter no máximo 3MB!', true);
+                event.target.value = '';
+                return;
+            }
+
             try {
                 currentImageData = await compressImage(file);
                 document.getElementById('imagePreview').src = currentImageData;
                 document.getElementById('previewContainer').classList.remove('hidden');
-                showToast('Foto otimizada com sucesso!');
+                const kb = Math.round((currentImageData.length * 3 / 4) / 1024);
+                showToast(`Foto preparada (${kb} KB).`);
             } catch (error) {
+                console.error(error);
                 currentImageData = null;
-                showToast('Erro ao carregar imagem.', true);
+                event.target.value = '';
+                showToast(error.message || 'Erro ao preparar a foto.', true);
             }
         }
 
@@ -497,80 +641,91 @@
             document.getElementById('previewContainer').classList.add('hidden');
         }
 
-        // SALVAR LANÇAMENTO NO SUPABASE
-        async function handleFormSubmit(e) {
+        // SUBMIT DO FORMULÁRIO DE LANÇAMENTO
+        function handleFormSubmit(e) {
             e.preventDefault();
+
             if (!currentSession || currentSession.isManager) {
-                showToast('Entre com um passaporte válido de membro.', true);
+                showToast('Entre com seu passaporte de membro para registrar farm.', true);
+                return;
+            }
+            const member = currentSession.name;
+            const passport = currentSession.passport;
+            const item = document.getElementById('itemSelect').value;
+            const selectedOperation = document.querySelector('input[name="operation"]:checked');
+            const operation = selectedOperation ? selectedOperation.value : 'ENTRY';
+            const quantity = parseInt(document.getElementById('itemQuantity').value, 10);
+
+            if (!member || !item || !Number.isSafeInteger(quantity) || quantity <= 0) {
+                showToast('Preencha os campos corretamente.', true);
                 return;
             }
 
-            const item = document.getElementById('itemSelect').value;
-            const operation = document.querySelector('input[name="operation"]:checked').value;
-            const quantity = parseInt(document.getElementById('itemQuantity').value, 10);
-
             if (!currentImageData) {
-                showToast('Anexe a foto do baú!', true);
+                showToast('É obrigatório anexar a foto do baú!', true);
                 return;
             }
 
             const newLog = {
                 id: Date.now(),
                 timestamp: new Date().toLocaleString('pt-BR'),
-                passport: currentSession.passport,
+                member,
+                passport,
                 item,
                 operation,
                 quantity,
                 image: currentImageData
             };
 
-            const submitBtn = document.getElementById('submitFarmBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Enviando pra nuvem...';
+            // Primeiro grava o histórico. Só atualiza a tela/estoque se o navegador aceitar.
+            const previousLogs = logs;
+            const nextLogs = [newLog, ...previousLogs];
 
             try {
-                const { error } = await _supabase.from('farm_logs').insert([newLog]);
-                if (error) throw error;
-
-                logs.unshift({
-                    ...newLog,
-                    member: `Passaporte [${newLog.passport}]`
-                });
-
-                document.getElementById('farmForm').reset();
-                removeImagePreview();
-                document.getElementById('memberName').value = currentSession.passport;
-
-                renderStock();
-                renderGoals();
-                renderHistory();
-                showToast('Farm registrado com sucesso na nuvem!');
-            } catch (err) {
-                console.error(err);
-                showToast('Erro ao salvar no banco de dados online.', true);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i> Confirmar & Registrar Farm';
-                lucide.createIcons();
+                localStorage.setItem('gta_farm_logs_v2', JSON.stringify(nextLogs));
+                logs = nextLogs;
+            } catch (error) {
+                logs = previousLogs;
+                console.error('Falha ao salvar o histórico:', error);
+                if (error && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
+                    showToast('Armazenamento do navegador cheio. Exporte o histórico e libere espaço antes de registrar.', true);
+                } else {
+                    showToast('Não foi possível salvar o registro. Nenhum estoque foi alterado.', true);
+                }
+                return;
             }
+
+            document.getElementById('farmForm').reset();
+            removeImagePreview();
+
+            renderStock();
+            renderGoals();
+            renderHistory();
+            showToast('Farm registrado com sucesso!');
         }
 
+        // CALCULOS DE ESTOQUE GERAL
         function calculateStock() {
             const stock = {};
             catalog.forEach(item => stock[item] = 0);
+
             logs.forEach(log => {
                 if (stock[log.item] !== undefined) {
-                    if (log.operation === 'ENTRY') stock[log.item] += Number(log.quantity);
-                    if (log.operation === 'EXIT') stock[log.item] -= Number(log.quantity);
+                    if (log.operation === 'ENTRY') stock[log.item] += log.quantity;
+                    if (log.operation === 'EXIT') stock[log.item] -= log.quantity;
                 }
             });
+
             return stock;
         }
 
-        function getMemberProgress(passport, itemName) {
+        // CALCULOS DE ENTREGA INDIVIDUAL DE CADA MEMBRO (PARA A META)
+        function getMemberProgress(passport, itemName, memberName = '') {
             let total = 0;
             logs.forEach(log => {
-                if (Number(log.id) > goalResetLogId && String(log.passport) === String(passport) && log.item === itemName) {
+                const sameMember = String(log.passport || '') === String(passport) ||
+                    (!log.passport && String(log.member || '').trim().toLowerCase() === String(memberName).trim().toLowerCase());
+                if (Number(log.id) > goalResetLogId && sameMember && log.item === itemName) {
                     if (log.operation === 'ENTRY') total += Number(log.quantity) || 0;
                     if (log.operation === 'EXIT') total -= Number(log.quantity) || 0;
                 }
@@ -578,6 +733,7 @@
             return Math.max(0, total);
         }
 
+        // RENDERIZAR ESTOQUE
         function renderStock() {
             const stockGrid = document.getElementById('stockGrid');
             const totals = calculateStock();
@@ -585,7 +741,298 @@
 
             catalog.forEach(item => {
                 const amount = totals[item] || 0;
+                const isNegative = amount < 0;
+                
                 const card = document.createElement('div');
-                card.className = `bg-brand-cardBg border border-brand-border rounded-xl p-4 shadow-md flex flex-col justify-between`;
+                card.className = `bg-brand-cardBg border ${isNegative ? 'border-red-900/50' : 'border-brand-border'} rounded-xl p-4 shadow-md flex flex-col justify-between hover:border-emerald-500/40 transition`;
                 card.innerHTML = `
-                    <div class="flex items-center justify-between
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-bold tracking-wider uppercase truncate">${item}</span>
+                        <i data-lucide="package" class="w-4 h-4 text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold ${isNegative ? 'text-red-400' : 'text-white'}">
+                            ${amount.toLocaleString('pt-BR')}
+                        </span>
+                        <span class="text-xs text-slate-500 ml-1">unidades</span>
+                    </div>
+                `;
+                stockGrid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // RELATÓRIO GERENCIAL: META ÚNICA APLICADA A CADA ITEM PARA CADA MEMBRO
+        function renderGoals() {
+            const body = document.getElementById('managerReportBody');
+            const empty = document.getElementById('managerReportEmpty');
+            const summary = document.getElementById('managerSummary');
+            if (!body || !empty || !summary) return;
+
+            body.innerHTML = '';
+            summary.innerHTML = '';
+
+            if (!managerUnlocked || !currentSession?.isManager) return;
+
+            const totalRows = members.length * catalog.length;
+            if (!members.length || !catalog.length || globalWeeklyGoal <= 0) {
+                empty.classList.remove('hidden');
+                empty.textContent = !members.length
+                    ? 'Nenhum membro cadastrado ainda.'
+                    : 'Defina a meta semanal geral para gerar o relatório.';
+                return;
+            }
+            empty.classList.add('hidden');
+
+            let completed = 0;
+            let sumPercent = 0;
+            const rows = [];
+
+            members.forEach(member => {
+                catalog.forEach(item => {
+                    const amount = getMemberProgress(member.passport, item, member.name);
+                    const rawPercent = (amount / globalWeeklyGoal) * 100;
+                    const percent = Math.round(rawPercent);
+                    const done = amount >= globalWeeklyGoal;
+                    if (done) completed++;
+                    sumPercent += Math.min(100, rawPercent);
+                    rows.push({ member, item, amount, percent, done });
+                });
+            });
+
+            const average = totalRows ? Math.round(sumPercent / totalRows) : 0;
+            const cards = [
+                { label: 'Membros cadastrados', value: members.length.toLocaleString('pt-BR'), icon: 'users' },
+                { label: 'Metas concluídas', value: `${completed} / ${totalRows}`, icon: 'trophy' },
+                { label: 'Progresso médio', value: `${average}%`, icon: 'chart-no-axes-column-increasing' }
+            ];
+            cards.forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4';
+                el.innerHTML = `<div class="flex items-center justify-between text-slate-400 text-[11px]"><span>${card.label}</span><i data-lucide="${card.icon}" class="w-4 h-4 text-purple-400"></i></div><div class="text-2xl font-extrabold text-white mt-2">${card.value}</div>`;
+                summary.appendChild(el);
+            });
+
+            rows.sort((a,b) => a.member.name.localeCompare(b.member.name, 'pt-BR') || a.item.localeCompare(b.item, 'pt-BR'));
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const width = Math.min(100, row.percent);
+                tr.innerHTML = `
+                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(row.member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(row.member.passport)}</div></td>
+                    <td class="px-3 py-3">${escapeHtml(row.item)}</td>
+                    <td class="px-3 py-3 font-mono text-white">${row.amount.toLocaleString('pt-BR')}</td>
+                    <td class="px-3 py-3 font-mono">${globalWeeklyGoal.toLocaleString('pt-BR')}</td>
+                    <td class="px-3 py-3 min-w-[150px]"><div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${row.done ? 'bg-emerald-500' : 'bg-purple-500'}" style="width:${width}%"></div></div><span class="font-bold ${row.done ? 'text-emerald-400' : 'text-slate-300'}">${row.percent}%</span></div></td>
+                    <td class="px-3 py-3">${row.done ? '<span class="text-emerald-400 font-bold">Concluída</span>' : '<span class="text-amber-400">Em andamento</span>'}</td>`;
+                body.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        // Funções antigas de meta individual ficam desativadas por compatibilidade.
+        function openGoalModal() { showToast('Agora a meta é única e definida no painel da gerência.', true); }
+        function closeGoalModal() {}
+        function handleSaveGoal(e) { e.preventDefault(); }
+        function deleteGoal(index) {}
+
+        // RENDERIZAR HISTÓRICO
+        function renderHistory() {
+            if (!managerUnlocked || !currentSession?.isManager) return;
+            const tbody = document.getElementById('historyTableBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const emptyMsg = document.getElementById('emptyHistoryMsg');
+
+            tbody.innerHTML = '';
+
+            const filteredLogs = logs.filter(log =>
+                String(log.member || '').toLowerCase().includes(search) ||
+                String(log.item || '').toLowerCase().includes(search)
+            );
+
+            if (filteredLogs.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            emptyMsg.classList.add('hidden');
+
+            filteredLogs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-900/60 transition';
+                const isEntry = log.operation === 'ENTRY';
+
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-slate-400 text-[11px] font-mono">${escapeHtml(String(log.timestamp || ''))}</td>
+                    <td class="py-3 px-3 font-semibold text-white">${escapeHtml(String(log.member || ''))}</td>
+                    <td class="py-3 px-3"><span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[11px] font-mono border border-slate-700">${escapeHtml(String(log.item || ''))}</span></td>
+                    <td class="py-3 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${isEntry ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' : 'bg-red-950/60 text-red-400 border-red-800'}">
+                            ${isEntry ? '+ ENTRADA' : '- SAÍDA'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 text-right font-mono font-bold ${isEntry ? 'text-emerald-400' : 'text-red-400'}">
+                        ${isEntry ? '+' : '-'}${Number(log.quantity || 0).toLocaleString('pt-BR')}
+                    </td>
+                    <td class="py-3 px-3 text-center"></td>
+                    <td class="py-3 px-3 text-center">
+                        <button type="button" class="delete-log-btn text-slate-500 hover:text-red-400 p-1" title="Excluir este registro">
+                            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </td>
+                `;
+
+                const photoCell = tr.children[5];
+                if (log.image) {
+                    const photoButton = document.createElement('button');
+                    photoButton.type = 'button';
+                    photoButton.className = 'inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-[11px] font-semibold bg-emerald-950/50 border border-emerald-800/60 px-2.5 py-1 rounded-lg';
+                    photoButton.innerHTML = '<i data-lucide="image" class="w-3.5 h-3.5"></i> Ver Print';
+                    photoButton.addEventListener('click', () => openImageModal(log.image));
+                    photoCell.appendChild(photoButton);
+                } else {
+                    photoCell.innerHTML = '<span class="text-slate-600 text-[11px]">Sem foto</span>';
+                }
+
+                tr.querySelector('.delete-log-btn').addEventListener('click', () => deleteLog(log.id));
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function deleteLog(id) {
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
+            logs = logs.filter(log => log.id !== id);
+            saveData();
+            renderStock();
+            renderGoals();
+            renderHistory();
+            showToast('Registro excluído!');
+        }
+
+        // CATÁLOGO DE ITENS
+        function renderCatalogSelects() {
+            const selects = [document.getElementById('itemSelect'), document.getElementById('goalItemSelect')];
+            selects.forEach(select => {
+                if(!select) return;
+                select.innerHTML = '';
+                catalog.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item;
+                    opt.textContent = item;
+                    select.appendChild(opt);
+                });
+            });
+        }
+
+        function openCatalogModal() {
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
+            renderCatalogList();
+            document.getElementById('catalogModal').classList.remove('hidden');
+        }
+
+        function closeCatalogModal() {
+            document.getElementById('catalogModal').classList.add('hidden');
+        }
+
+        function renderCatalogList() {
+            const container = document.getElementById('catalogList');
+            container.innerHTML = '';
+            
+            catalog.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-center justify-between p-2 bg-slate-900 border border-slate-800 rounded-lg text-xs';
+                itemDiv.innerHTML = `
+                    <span class="font-medium text-slate-200">${item}</span>
+                    <button onclick="removeCatalogItem(${index})" class="text-slate-500 hover:text-red-400">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                    </button>
+                `;
+                container.appendChild(itemDiv);
+            });
+            lucide.createIcons();
+        }
+
+        function addNewCatalogItem() {
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
+            const input = document.getElementById('newItemInput');
+            const name = input.value.trim();
+
+            if (!name) return;
+
+            if (catalog.some(i => i.toLowerCase() === name.toLowerCase())) {
+                showToast('Este item já existe no catálogo.', true);
+                return;
+            }
+
+            catalog.push(name);
+            input.value = '';
+            saveData();
+            renderCatalogSelects();
+            renderCatalogList();
+            renderStock();
+            showToast('Novo item cadastrado!');
+        }
+
+        function removeCatalogItem(index) {
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
+            catalog.splice(index, 1);
+            saveData();
+            renderCatalogSelects();
+            renderCatalogList();
+            renderStock();
+            showToast('Item removido do catálogo.');
+        }
+
+        // VISUALIZAÇÃO DE FOTO
+        function openImageModal(imgSrc) {
+            document.getElementById('modalImg').src = imgSrc;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+
+        // EXPORTAR CSV
+        function exportData() {
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
+            if (logs.length === 0) {
+                showToast('Sem registros para exportar.', true);
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Data/Hora;Membro;Item;Operacao;Quantidade\n";
+
+            logs.forEach(log => {
+                const op = log.operation === 'ENTRY' ? 'Entrada' : 'Saida';
+                csvContent += `"${log.timestamp}";"${log.member}";"${log.item}";"${op}";${log.quantity}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `farm_faccao_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // RESETAR HISTÓRICO
+        function clearHistory() {
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
+            if (confirm("Deseja apagar TODO o histórico? Isso irá zerar o estoque e o progresso das metas.")) {
+                logs = [];
+                saveData();
+                renderStock();
+                renderGoals();
+                renderHistory();
+                showToast('Histórico resetado!');
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
