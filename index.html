@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciador de Farm - Facção GTA RP</title>
+    <title>É OS GIVO - Gerenciador de Farm</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,23 +23,24 @@
 </head>
 <body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased pb-12">
 
-    <!-- TELA DE LOGIN SIMPLES (APENAS ID OU SENHA MASTER) -->
+    <!-- TELA DE LOGIN -->
     <div id="loginScreen" class="fixed inset-0 bg-darkbg/95 z-50 flex items-center justify-center p-4">
-        <div class="bg-cardbg border border-slate-700 p-8 rounded-2xl shadow-2xl max-w-sm w-full space-y-6">
-            <div class="text-center">
-                <div class="bg-emerald-500/10 text-emerald-400 w-16 h-16 mx-auto rounded-2xl flex items-center justify-center border border-emerald-500/20 mb-3">
-                    <i class="fa-solid fa-id-badge text-3xl"></i>
+        <div class="bg-cardbg border border-slate-700 p-8 rounded-2xl shadow-2xl max-w-sm w-full space-y-6 text-center">
+            
+            <div class="space-y-3">
+                <div class="w-24 h-24 mx-auto rounded-2xl overflow-hidden border-2 border-emerald-500/50 shadow-lg shadow-emerald-950 bg-black flex items-center justify-center">
+                    <img src="https://media.discordapp.net/attachments/1556827955873972225/1569869452420325517/398a0706-2ebf-40e9-8f73-1c01685626bc.jpg?ex=6af5065c&is=6af3b4dc&hm=33eceadc84439972fbb0fd90e9ddb399fcf47107a204792cc62a511c5886ed87&=&format=webp&width=640&height=640" alt="É Os Givo Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://images.vexels.com/content/users/preview/200091/11f81d1136b69b35061612a454d60d05.png';">
                 </div>
-                <h1 class="text-xl font-bold">FARM GIVOS</h1>
-                <p class="text-xs text-slate-400 mt-1">Digite seu ID / Passaporte para entrar</p>
+                <h1 class="text-xl font-bold uppercase tracking-wider">É OS GIVO</h1>
+                <p class="text-xs text-slate-400">Digite seu ID / Passaporte para entrar</p>
             </div>
 
-            <form id="loginForm" class="space-y-4">
+            <form id="loginForm" class="space-y-4 text-left">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Passaporte / ID</label>
                     <input type="text" id="loginPassport" required placeholder="Ex: 12" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-center font-bold tracking-wider">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30 cursor-pointer">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30 cursor-pointer uppercase">
                     Acessar Sistema
                 </button>
             </form>
@@ -55,11 +56,11 @@
     <header class="bg-cardbg border-b border-slate-700 shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl border border-emerald-500/20">
-                    <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+                <div class="w-12 h-12 rounded-xl overflow-hidden border border-emerald-500/40 bg-black flex items-center justify-center">
+                    <img src="https://media.discordapp.net/attachments/1556827955873972225/1569869452420325517/398a0706-2ebf-40e9-8f73-1c01685626bc.jpg?ex=6af5065c&is=6af3b4dc&hm=33eceadc84439972fbb0fd90e9ddb399fcf47107a204792cc62a511c5886ed87&=&format=webp&width=640&height=640" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide">FARM GIVOS</h1>
+                    <h1 class="text-xl font-bold tracking-wide">É OS GIVO</h1>
                     <p class="text-xs text-slate-400">Logado como: <span id="userSessionBadge" class="text-emerald-400 font-semibold"></span></p>
                 </div>
             </div>
@@ -228,7 +229,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE CONTROLE -->
+    <!-- SCRIPT DE CONTROLE CORRIGIDO -->
     <script>
         const MASTER_PASSWORD = "488457@";
         let currentUser = JSON.parse(localStorage.getItem('givos_user')) || null;
@@ -301,7 +302,6 @@
             const container = document.getElementById('activeIdsList');
             container.innerHTML = '';
             
-            // Pega IDs únicos que já registraram farm
             let activeIds = [...new Set(logs.map(l => l.member))];
             
             if (activeIds.length === 0) {
@@ -318,18 +318,24 @@
             });
         }
 
-        // REGISTRAR FARM
+        // REGISTRAR FARM COM TRATAMENTO BLINDADO DE LEITURA MULTI-INPUT
         document.getElementById('farmForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const item = document.getElementById('itemSelect').value;
             const type = document.getElementById('actionType').value;
-            const qty = parseInt(document.getElementById('itemQuantity').value);
+            const qtyInput = document.getElementById('itemQuantity');
+            const qty = parseInt(qtyInput.value);
             const photoInput = document.getElementById('bauPhoto');
+
+            if(!qty || qty <= 0) {
+                alert("Digite uma quantidade válida.");
+                return;
+            }
 
             if(photoInput.files && photoInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    const photoUrl = e.target.result;
+                reader.onload = function(event) {
+                    const photoUrl = event.target.result;
 
                     if (type === 'entrada') {
                         inventory[item] = (inventory[item] || 0) + qty;
@@ -348,11 +354,19 @@
                     logs.unshift(newLog);
 
                     saveAndRefresh();
-                    document.getElementById('farmForm').reset();
-                    memberNameInput.value = currentUser.name;
+                    
+                    // Limpa o formulário com segurança total para permitir novos registros seguidos
+                    qtyInput.value = '';
+                    photoInput.value = '';
+                    
                     alert("Movimentação registrada com sucesso!");
                 }
+                reader.onerror = function() {
+                    alert("Erro ao ler o arquivo de imagem. Tente enviar outra foto.");
+                };
                 reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                alert("Selecione a foto do baú.");
             }
         });
 
@@ -381,18 +395,23 @@
                 renderStock();
                 renderLogs();
                 renderGoals();
+                if(currentUser.isManager) renderActiveIds();
                 alert("Semana resetada com sucesso!");
             }
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('givos_stock', JSON.stringify(inventory));
-            localStorage.setItem('givos_logs', JSON.stringify(logs));
-            localStorage.setItem('givos_goals', JSON.stringify(goals));
+            try {
+                localStorage.setItem('givos_stock', JSON.stringify(inventory));
+                localStorage.setItem('givos_logs', JSON.stringify(logs));
+                localStorage.setItem('givos_goals', JSON.stringify(goals));
+            } catch(e) {
+                alert("Aviso: O armazenamento do navegador ficou cheio devido ao tamanho das fotos.");
+            }
             renderStock();
             renderLogs();
             renderGoals();
-            if(currentUser.isManager) renderActiveIds();
+            if(currentUser && currentUser.isManager) renderActiveIds();
         }
 
         function renderStock() {
@@ -450,39 +469,4 @@
             });
 
             if (Object.keys(goals).length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Nenhuma meta definida pelo gerente ainda.</p>`;
-                return;
-            }
-
-            for (let [member, target] of Object.entries(goals)) {
-                const current = memberTotals[member] || 0;
-                let percent = Math.min(100, Math.round((current / target) * 100));
-                let barColor = percent >= 100 ? 'bg-emerald-500' : 'bg-amber-500';
-                let statusText = percent >= 100 ? '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-check"></i> Concluída</span>' : `${percent}%`;
-
-                container.innerHTML += `
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="font-bold text-slate-200">${member}</span>
-                            <span class="text-slate-400">${current} / ${target} un. (${statusText})</span>
-                        </div>
-                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                            <div class="${barColor} h-2.5 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function openPhotoModal(src) {
-            document.getElementById('modalImage').src = src;
-            document.getElementById('photoModal').classList.remove('hidden');
-            document.getElementById('photoModal').classList.add('flex');
-        }
-        function closePhotoModal() {
-            document.getElementById('photoModal').classList.add('hidden');
-            document.getElementById('photoModal').classList.remove('flex');
-        }
-    </script>
-</body>
-</html>
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Nenhuma meta definida pelo gerente
