@@ -44,7 +44,7 @@
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Senha</label>
                     <input type="password" id="loginPassword" required placeholder="Sua senha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30 cursor-pointer">
                     Entrar no Sistema
                 </button>
                 <div class="flex justify-between items-center text-xs pt-2">
@@ -67,7 +67,7 @@
                     <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Crie sua Senha</label>
                     <input type="password" id="regPassword" required placeholder="Sua senha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30 cursor-pointer">
                     Finalizar Cadastro
                 </button>
                 <div class="text-center text-xs pt-2">
@@ -198,4 +198,77 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Print / Foto do Baú <span class="text-red-400">*O
+                        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Print / Foto do Baú <span class="text-red-400">*Obrigatório</span></label>
+                        <input type="file" id="bauPhoto" accept="image/*" required class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-500/10 file:text-emerald-400 hover:file:bg-emerald-500/20 cursor-pointer">
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-check"></i> Salvar Registro
+                    </button>
+                </form>
+            </section>
+
+            <!-- ACOMPANHAMENTO DE METAS -->
+            <section class="lg:col-span-2 bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
+                    <i class="fa-solid fa-bullseye text-emerald-400"></i> Progresso das Metas Semanais
+                </h2>
+                <div class="space-y-4 flex-1 overflow-y-auto max-h-[350px]" id="goalsListContainer">
+                    <!-- Preenchido via JS -->
+                </div>
+            </section>
+
+        </div>
+
+        <!-- HISTÓRICO DE MOVIMENTAÇÕES -->
+        <section class="bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">
+                <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i> Histórico de Registros
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 border-b border-slate-700">
+                        <tr>
+                            <th class="p-3">Data/Hora</th>
+                            <th class="p-3">Membro</th>
+                            <th class="p-3">Item</th>
+                            <th class="p-3">Ação</th>
+                            <th class="p-3">Qtd</th>
+                            <th class="p-3">Foto do Baú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody" class="divide-y divide-slate-800">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE VISUALIZAÇÃO DE FOTO -->
+    <div id="photoModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-3xl w-full bg-cardbg rounded-xl border border-slate-700 p-2">
+            <button onclick="closePhotoModal()" class="absolute -top-3 -right-3 bg-red-600 text-white w-8 h-8 rounded-full font-bold shadow-lg flex items-center justify-center hover:bg-red-500 cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="modalImage" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-lg">
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CONTROLE -->
+    <script>
+        const MASTER_PASSWORD = "488457@";
+        let currentUser = JSON.parse(localStorage.getItem('givos_user')) || null;
+        let registeredUsers = JSON.parse(localStorage.getItem('givos_registered_users')) || [];
+
+        // ELEMENTOS
+        const loginScreen = document.getElementById('loginScreen');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const userSessionBadge = document.getElementById('userSessionBadge');
+        const managerIndicator = document.getElementById('managerIndicator');
+        const managerPanel = document.getElementById('managerPanel');
+        const memberNameInput = document.getElementById('memberName');
+
+        // DADOS
