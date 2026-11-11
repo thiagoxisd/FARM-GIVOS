@@ -386,7 +386,7 @@
                 return;
             }
 
-            if (!/^\\d{1,12}$/.test(credential)) {
+            if (!/^\d+$/.test(credential)) {
                 error.textContent = 'Informe um passaporte numérico válido.';
                 error.classList.remove('hidden');
                 return;
