@@ -13,7 +13,7 @@
                 extend: {
                     colors: {
                         brand: {
-                            500: '#10b981', // Emerald / Neon Green
+                            500: '#10b981',
                             600: '#059669',
                             darkBg: '#080b12',
                             cardBg: '#0f172a',
@@ -27,6 +27,8 @@
     </script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Supabase (banco de dados na nuvem) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -35,20 +37,10 @@
             background-color: #080b12;
             color: #f1f5f9;
         }
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #080b12;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #080b12; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
@@ -67,14 +59,21 @@
                     <p class="text-xs text-slate-400">Controle do Baú & Metas Semanais da Tropa</p>
                 </div>
             </div>
-            
-            <div class="flex items-center gap-3">
-                <span id="sessionBadge" class="text-xs text-emerald-300 font-semibold hidden sm:inline"></span>
-                <button id="exportBtn" onclick="managerAction(exportData)" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition">
-                    <i data-lucide="download" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar CSV</span>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <span id="syncBadge" class="hidden text-[10px] font-semibold px-2 py-1 rounded border border-slate-700 text-slate-300"></span>
+                <span id="sessionBadge" class="text-xs text-emerald-300 font-semibold hidden md:inline"></span>
+                <button id="refreshBtn" onclick="refreshData()" class="hidden items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition" title="Buscar dados atualizados do banco">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i><span class="hidden lg:inline">Atualizar</span>
                 </button>
-                <button id="clearHistoryBtn" onclick="managerAction(clearHistory)" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-xs font-semibold rounded-lg border border-red-800/50 text-red-300 transition">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i><span class="hidden sm:inline">Resetar Histórico</span>
+                <button id="exportBtn" onclick="managerAction(exportData)" class="hidden items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition" title="Exportar histórico em CSV">
+                    <i data-lucide="download" class="w-4 h-4"></i><span class="hidden xl:inline">Exportar CSV</span>
+                </button>
+                <button id="importBtn" onclick="managerAction(importOldLocalData)" class="hidden items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition" title="Copiar dados que estavam salvos neste navegador para o banco">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i><span class="hidden xl:inline">Importar dados antigos</span>
+                </button>
+                <button id="clearHistoryBtn" onclick="managerAction(clearHistory)" class="hidden items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-xs font-semibold rounded-lg border border-red-800/50 text-red-300 transition" title="Apagar todo o histórico">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i><span class="hidden xl:inline">Resetar Histórico</span>
                 </button>
                 <button id="logoutBtn" onclick="logoutSession()" class="hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition">
                     Sair
@@ -85,7 +84,7 @@
 
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
-        
+
         <!-- 1. DASHBOARD DE ESTOQUE ATUAL -->
         <section>
             <div class="flex items-center justify-between mb-4">
@@ -149,17 +148,22 @@
 
         <!-- 3. FORMULÁRIO DE REGISTRO COM FOTO -->
         <section class="bg-brand-cardBg border border-brand-border rounded-xl p-5 shadow-2xl">
-            <div class="border-b border-brand-border pb-3 mb-5">
-                <h2 class="text-base font-bold text-white flex items-center gap-2">
-                    <i data-lucide="file-plus" class="w-5 h-5 text-emerald-400"></i>
-                    Novo Lançamento de Farm (Com foto do Baú)
-                </h2>
-                <p class="text-xs text-slate-400">Registre as entradas ou saídas enviando obrigatoriamente a foto da print do baú.</p>
+            <div class="border-b border-brand-border pb-3 mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="file-plus" class="w-5 h-5 text-emerald-400"></i>
+                        Novo Lançamento de Farm (Com foto do Baú)
+                    </h2>
+                    <p class="text-xs text-slate-400">Registre as entradas ou saídas enviando obrigatoriamente a foto da print do baú.</p>
+                </div>
+                <span class="text-[10px] text-emerald-400/80 bg-emerald-950/40 border border-emerald-900/60 px-2 py-1 rounded-full flex items-center gap-1 self-start sm:self-auto">
+                    <i data-lucide="cloud" class="w-3 h-3"></i> Salvo na nuvem
+                </span>
             </div>
 
             <form id="farmForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    
+
                     <!-- Membro -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Membro / Passaporte <span class="text-emerald-400">*</span></label>
@@ -215,7 +219,7 @@
                                 <div class="flex flex-col items-center justify-center pt-3 pb-3">
                                     <i data-lucide="camera" class="w-6 h-6 text-slate-400 mb-1"></i>
                                     <p class="text-xs text-slate-400"><span class="font-bold text-emerald-400">Clique para anexar</span> a print da foto no baú</p>
-                                    <p class="text-[10px] text-slate-500">Formatos aceitos: PNG, JPG, WEBP</p>
+                                    <p class="text-[10px] text-slate-500">Formatos aceitos: PNG, JPG, WEBP (até 10MB)</p>
                                 </div>
                                 <input id="imageInput" type="file" accept="image/*" class="hidden" onchange="previewImage(event)">
                             </label>
@@ -233,7 +237,7 @@
 
                 <!-- SUBMIT -->
                 <div class="flex justify-end pt-2">
-                    <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-emerald-950/50 transition flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-emerald-950/50 transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
                         <i data-lucide="check-circle-2" class="w-4 h-4"></i>
                         Confirmar & Registrar Farm
                     </button>
@@ -278,10 +282,11 @@
                         <!-- Renderizado via JS -->
                     </tbody>
                 </table>
-                
+
                 <div id="emptyHistoryMsg" class="hidden text-center py-8 text-slate-500 text-xs">
                     Nenhum registro encontrado.
                 </div>
+                <p id="historyLimitMsg" class="hidden text-center pt-4 text-slate-500 text-[11px]"></p>
             </div>
         </section>
 
@@ -302,7 +307,7 @@
 
             <div class="py-4 space-y-4">
                 <div class="flex gap-2">
-                    <input type="text" id="newItemInput" placeholder="Ex: Pacote de C4" class="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
+                    <input type="text" id="newItemInput" maxlength="60" placeholder="Ex: Pacote de C4" class="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
                     <button onclick="addNewCatalogItem()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold">
                         Adicionar
                     </button>
@@ -341,223 +346,95 @@
             <p class="text-xs text-slate-400 text-center mt-2 mb-6">Digite seu passaporte numérico para acessar e registrar seu farm.</p>
             <form onsubmit="submitEntry(event)" class="space-y-3">
                 <input id="entryCredential" type="password" inputmode="numeric" autocomplete="off" required placeholder="Passaporte" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-center text-lg tracking-widest text-white focus:outline-none focus:border-emerald-500">
-                <input id="firstRegistrationName" type="text" autocomplete="off" placeholder="Seu nome / apelido (somente no primeiro acesso)" class="hidden w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
+                <input id="firstRegistrationName" type="text" maxlength="60" autocomplete="off" placeholder="Seu nome / apelido (somente no primeiro acesso)" class="hidden w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
                 <p id="entryError" class="hidden text-xs text-red-400 text-center"></p>
-                <button id="entrySubmitBtn" type="submit" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition">Acessar sistema</button>
+                <button id="entrySubmitBtn" type="submit" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition disabled:opacity-60 disabled:cursor-not-allowed">Acessar sistema</button>
             </form>
-            <p class="text-[10px] text-slate-500 text-center mt-5">O passaporte identifica seu cadastro. A gerência utiliza uma credencial master.</p>
+            <p id="entryHint" class="text-[10px] text-slate-500 text-center mt-5">O passaporte identifica seu cadastro. A gerência utiliza uma credencial master.</p>
         </div>
     </div>
 
     <!-- NOTIFICAÇÃO TOAST -->
-    <div id="toast" class="fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2.5 rounded-lg shadow-xl text-xs font-bold flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <div id="toast" class="fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2.5 rounded-lg shadow-xl text-xs font-bold flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-[120]">
         <i data-lucide="check-circle" class="w-4 h-4"></i>
         <span id="toastMsg">Operação realizada!</span>
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // ITENS PADRÃO SOLICITADOS
-        const DEFAULT_ITEMS = ['Flor de Cannabis', 'Thinner', 'Quetamina'];
-        
-        let catalog = JSON.parse(localStorage.getItem('gta_farm_catalog_v2')) || DEFAULT_ITEMS;
-        let logs = JSON.parse(localStorage.getItem('gta_farm_logs_v2')) || [];
-        let goals = JSON.parse(localStorage.getItem('gta_farm_goals_v2')) || [];
-        let members = JSON.parse(localStorage.getItem('gta_farm_members_v1')) || [];
-        let globalWeeklyGoal = Number(localStorage.getItem('gta_farm_global_goal_v1')) || 0;
-        let currentImageData = null;
-        let managerUnlocked = false;
+        // =====================================================================
+        //  1) CONFIGURAÇÃO DO BANCO DE DADOS (SUPABASE)
+        //  Cole abaixo os dois valores do SEU projeto Supabase.
+        //  URL:       Project Settings > Data API > Project URL
+        //  CHAVE:     Project Settings > API Keys > Publishable key
+        //             (em projetos antigos ela aparece como "anon public")
+        //  NUNCA cole aqui a "Secret key" (sb_secret_...).
+        // =====================================================================
+        const SUPABASE_URL = 'https://iqkbbupamjmgrekmbtfz.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_b1crTCz-gzTpfJm4zrflrg_n7MR9TDw';
+        // =====================================================================
+
+        // Aceita a URL com ou sem "/rest/v1/" no final.
+        const PROJECT_URL = SUPABASE_URL.trim().replace(/\/+$/, '').replace(/\/rest\/v1$/i, '');
+
+        const CONFIGURED = PROJECT_URL.startsWith('https://') && !SUPABASE_ANON_KEY.includes('COLE_AQUI');
+
+        const sb = CONFIGURED
+            ? window.supabase.createClient(PROJECT_URL, SUPABASE_ANON_KEY, {
+                  auth: { persistSession: false, autoRefreshToken: false }
+              })
+            : null;
+
+        // Dados em memória (sempre espelhando o banco)
+        let catalog = [];
+        let logs = [];
+        let members = [];
+        let settings = { global_goal: 0, reset_at: null };
+
+        let currentImageBlob = null;
         let currentSession = null;
-        let goalResetLogId = Number(localStorage.getItem('gta_farm_goal_reset_id_v2')) || 0;
-        const MASTER_PASSWORD = '488457@';
+        let managerUnlocked = false;
+        let managerPassword = null;
+        let dataLoaded = false;
+        let syncState = 'ok';
+        const HISTORY_RENDER_LIMIT = 300;
 
-        function submitEntry(event) {
-            event.preventDefault();
-            const credential = document.getElementById('entryCredential').value.trim();
-            const error = document.getElementById('entryError');
-            const nameInput = document.getElementById('firstRegistrationName');
-            error.classList.add('hidden');
+        // ---------- utilitários ----------
+        function escapeHtml(value) {
+            return String(value === null || value === undefined ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
-            // A mesma tela reconhece a credencial master sem exibir botão de gerente.
-            if (credential === MASTER_PASSWORD) {
-                managerUnlocked = true;
-                currentSession = { passport: 'MASTER', name: 'Gerência', isManager: true };
-                enterSystem();
-                return;
-            }
-
-            if (!/^\d+$/.test(credential)) {
-                error.textContent = 'Informe um passaporte numérico válido.';
-                error.classList.remove('hidden');
-                return;
-            }
-
-            const found = members.find(member => String(member.passport) === credential);
-            if (found) {
-                currentSession = { ...found, isManager: false };
-                managerUnlocked = false;
-                enterSystem();
-                return;
-            }
-
-            // Primeiro acesso: solicitar nome e cadastrar o passaporte único.
-            if (nameInput.classList.contains('hidden')) {
-                nameInput.classList.remove('hidden');
-                nameInput.required = true;
-                nameInput.focus();
-                document.getElementById('entrySubmitBtn').textContent = 'Cadastrar e acessar';
-                error.textContent = 'Passaporte ainda não cadastrado. Informe seu nome para criar o cadastro.';
-                error.classList.remove('hidden');
-                return;
-            }
-
-            const name = nameInput.value.trim();
-            if (!name) {
-                error.textContent = 'Informe seu nome ou apelido para concluir o cadastro.';
-                error.classList.remove('hidden');
-                return;
-            }
-            if (members.some(member => String(member.passport) === credential)) {
-                error.textContent = 'Este passaporte já está cadastrado.';
-                error.classList.remove('hidden');
-                return;
-            }
-
-            const newMember = { passport: credential, name, createdAt: Date.now() };
-            const previousMembers = members;
-            members = [...members, newMember];
+        function parseJSON(raw, fallback) {
             try {
-                localStorage.setItem('gta_farm_members_v1', JSON.stringify(members));
-                currentSession = { ...newMember, isManager: false };
-                enterSystem();
-                showToast('Cadastro criado com sucesso!');
-            } catch (err) {
-                members = previousMembers;
-                error.textContent = 'Não foi possível salvar o cadastro neste navegador.';
-                error.classList.remove('hidden');
-            }
-        }
-
-        function enterSystem() {
-            document.getElementById('entryGate').classList.add('hidden');
-            document.getElementById('sessionBadge').textContent = currentSession.isManager
-                ? 'GERÊNCIA MASTER'
-                : `${currentSession.name} • Passaporte ${currentSession.passport}`;
-            document.getElementById('logoutBtn').classList.remove('hidden');
-
-            // Campo do membro fica vinculado à sessão; ninguém digita o nome a cada farm.
-            const memberField = document.getElementById('memberName');
-            memberField.value = currentSession.name;
-            memberField.readOnly = true;
-            memberField.classList.add('opacity-70');
-            const memberLabel = memberField.closest('div').parentElement.querySelector('label');
-            if (memberLabel) memberLabel.textContent = 'Membro identificado pela sessão';
-
-            if (managerUnlocked) {
-                document.getElementById('managerGoalsSection').classList.remove('hidden');
-                document.getElementById('managerHistorySection').classList.remove('hidden');
-                ['exportBtn','clearHistoryBtn','catalogManagerBtn'].forEach(id => document.getElementById(id).classList.remove('hidden'));
-                document.getElementById('globalWeeklyGoalInput').value = globalWeeklyGoal || '';
-                renderGoals();
-                renderHistory();
-            } else {
-                document.getElementById('managerGoalsSection').classList.add('hidden');
-                document.getElementById('managerHistorySection').classList.add('hidden');
-            }
-            renderStock();
-            renderCatalogSelects();
-            renderGoals();
-            lucide.createIcons();
-        }
-
-        function logoutSession() {
-            managerUnlocked = false;
-            currentSession = null;
-            document.getElementById('entryCredential').value = '';
-            document.getElementById('firstRegistrationName').value = '';
-            document.getElementById('firstRegistrationName').classList.add('hidden');
-            document.getElementById('firstRegistrationName').required = false;
-            document.getElementById('entrySubmitBtn').textContent = 'Acessar sistema';
-            document.getElementById('sessionBadge').textContent = '';
-            document.getElementById('logoutBtn').classList.add('hidden');
-            ['exportBtn','clearHistoryBtn','catalogManagerBtn'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            document.getElementById('entryGate').classList.remove('hidden');
-        }
-
-        function managerAction(action) {
-            if (!managerUnlocked || !currentSession?.isManager) {
-                showToast('Ação exclusiva da gerência.', true);
-                return;
-            }
-            action();
-        }
-
-        function saveGlobalGoal() {
-            if (!managerUnlocked || !currentSession?.isManager) return;
-            const value = Number(document.getElementById('globalWeeklyGoalInput').value);
-            if (!Number.isSafeInteger(value) || value <= 0) {
-                showToast('Informe uma meta semanal inteira maior que zero.', true);
-                return;
-            }
-            const oldValue = globalWeeklyGoal;
-            globalWeeklyGoal = value;
-            try {
-                localStorage.setItem('gta_farm_global_goal_v1', String(globalWeeklyGoal));
-                renderGoals();
-                showToast(`Meta geral definida: ${value.toLocaleString('pt-BR')} por item.`);
-            } catch (err) {
-                globalWeeklyGoal = oldValue;
-                showToast('Não foi possível salvar a meta geral.', true);
-            }
-        }
-
-        function resetWeeklyGoals() {
-            if (!managerUnlocked || !currentSession?.isManager) return;
-            if (!confirm('Resetar o progresso semanal de todos os membros e itens? O histórico e o estoque serão mantidos.')) return;
-            const previousReset = goalResetLogId;
-            goalResetLogId = Date.now();
-            try {
-                localStorage.setItem('gta_farm_goal_reset_id_v2', String(goalResetLogId));
-                renderGoals();
-                showToast('Progresso semanal resetado para todos!');
+                const value = JSON.parse(raw);
+                return value === null || value === undefined ? fallback : value;
             } catch (error) {
-                goalResetLogId = previousReset;
-                showToast('Não foi possível salvar o reset semanal.', true);
+                return fallback;
             }
         }
 
-        // INICIALIZAÇÃO
-        window.onload = function() {
-            lucide.createIcons();
-            renderCatalogSelects();
-            renderStock();
-            renderGoals();
-            renderHistory();
-            document.getElementById('entryCredential').focus();
-        };
+        function formatDateTime(value) {
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? String(value || '') : date.toLocaleString('pt-BR');
+        }
 
-        function saveData() {
-            // Salva cada conjunto de dados com tratamento de erro explícito.
-            try {
-                localStorage.setItem('gta_farm_catalog_v2', JSON.stringify(catalog));
-                localStorage.setItem('gta_farm_logs_v2', JSON.stringify(logs));
-                localStorage.setItem('gta_farm_goals_v2', JSON.stringify(goals));
-                localStorage.setItem('gta_farm_members_v1', JSON.stringify(members));
-                localStorage.setItem('gta_farm_global_goal_v1', String(globalWeeklyGoal));
-                return true;
-            } catch (error) {
-                console.error('Erro ao salvar dados:', error);
-                showToast('Falha ao salvar: armazenamento do navegador pode estar cheio.', true);
-                return false;
-            }
+        function goalResetTimestamp() {
+            if (!settings.reset_at) return 0;
+            const time = new Date(settings.reset_at).getTime();
+            return Number.isFinite(time) ? time : 0;
         }
 
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toastMsg');
             toastMsg.innerText = message;
-            
-            if(isError) {
+
+            if (isError) {
                 toast.classList.remove('bg-emerald-600');
                 toast.classList.add('bg-red-600');
             } else {
@@ -568,12 +445,665 @@
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            }, 3200);
         }
 
-        // FOTO / PREVIEW
-        // Reduz as imagens antes de armazená-las no localStorage.
-        function compressImage(file, maxSize = 1000, quality = 0.65) {
+        function showEntryError(message) {
+            const error = document.getElementById('entryError');
+            error.textContent = message;
+            error.classList.remove('hidden');
+        }
+
+        function hideEntryError() {
+            document.getElementById('entryError').classList.add('hidden');
+        }
+
+        function updateSyncBadge(state) {
+            syncState = state;
+            const badge = document.getElementById('syncBadge');
+            if (!badge) return;
+            if (!currentSession) {
+                badge.classList.add('hidden');
+                return;
+            }
+            const styles = {
+                ok: ['Sincronizado', 'border-emerald-800/60 text-emerald-400 bg-emerald-950/40'],
+                loading: ['Sincronizando...', 'border-slate-700 text-slate-300 bg-slate-900'],
+                error: ['Sem conexão', 'border-red-800/60 text-red-400 bg-red-950/40']
+            };
+            const pair = styles[state] || styles.ok;
+            badge.textContent = pair[0];
+            badge.className = 'text-[10px] font-semibold px-2 py-1 rounded border ' + pair[1];
+        }
+
+        // ---------- leitura do banco ----------
+        async function loadRemoteData() {
+            if (!sb) return false;
+            updateSyncBadge('loading');
+            try {
+                const [catalogRes, membersRes, settingsRes, logsRes] = await Promise.all([
+                    sb.from('farm_catalog').select('id,name').order('id', { ascending: true }),
+                    sb.from('farm_members').select('passport,name').order('name', { ascending: true }),
+                    sb.from('farm_settings').select('global_goal,reset_at').eq('id', 1).maybeSingle(),
+                    sb.from('farm_logs')
+                        .select('id,created_at,passport,member,item,operation,quantity,image_url')
+                        .order('created_at', { ascending: false })
+                        .order('id', { ascending: false })
+                        .limit(5000)
+                ]);
+
+                const firstError = catalogRes.error || membersRes.error || settingsRes.error || logsRes.error;
+                if (firstError) throw firstError;
+
+                catalog = (catalogRes.data || []).map(row => row.name);
+                members = membersRes.data || [];
+                settings = settingsRes.data || { global_goal: 0, reset_at: null };
+                logs = logsRes.data || [];
+                dataLoaded = true;
+                updateSyncBadge('ok');
+                return true;
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                updateSyncBadge('error');
+                return false;
+            }
+        }
+
+        async function refreshData(silent = false) {
+            if (!sb) return;
+            const ok = await loadRemoteData();
+            if (!ok) {
+                if (!silent) showToast('Não foi possível atualizar. Verifique a internet.', true);
+                return;
+            }
+            renderAll();
+            if (!silent) showToast('Dados atualizados!');
+        }
+
+        // ---------- login / sessão ----------
+        async function submitEntry(event) {
+            event.preventDefault();
+
+            if (!CONFIGURED) {
+                showEntryError('Banco de dados não configurado. Leia o arquivo GUIA-CONFIGURACAO.md.');
+                return;
+            }
+
+            const credential = document.getElementById('entryCredential').value.trim();
+            const nameInput = document.getElementById('firstRegistrationName');
+            const submitBtn = document.getElementById('entrySubmitBtn');
+            hideEntryError();
+
+            if (!credential) {
+                showEntryError('Digite seu passaporte.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            const originalText = submitBtn.textContent;
+
+            try {
+                // A credencial master é conferida no banco (a senha não fica mais no código).
+                const { data: isManager, error: managerError } = await sb.rpc('farm_is_manager', { p_password: credential });
+                if (managerError) throw managerError;
+
+                if (isManager === true) {
+                    managerUnlocked = true;
+                    managerPassword = credential;
+                    currentSession = { passport: 'MASTER', name: 'Gerência', isManager: true };
+                    await loadRemoteData();
+                    enterSystem();
+                    return;
+                }
+
+                if (!/^\d+$/.test(credential)) {
+                    showEntryError('Informe um passaporte numérico válido.');
+                    return;
+                }
+
+                if (!dataLoaded) await loadRemoteData();
+
+                const found = members.find(member => String(member.passport) === credential);
+                if (found) {
+                    currentSession = { ...found, isManager: false };
+                    managerUnlocked = false;
+                    enterSystem();
+                    return;
+                }
+
+                // Primeiro acesso: pede o nome e cria o cadastro.
+                if (nameInput.classList.contains('hidden')) {
+                    nameInput.classList.remove('hidden');
+                    nameInput.required = true;
+                    nameInput.focus();
+                    submitBtn.textContent = 'Cadastrar e acessar';
+                    showEntryError('Passaporte ainda não cadastrado. Informe seu nome para criar o cadastro.');
+                    return;
+                }
+
+                const name = nameInput.value.trim();
+                if (!name) {
+                    showEntryError('Informe seu nome ou apelido para concluir o cadastro.');
+                    return;
+                }
+
+                const { error: insertError } = await sb.from('farm_members').insert({ passport: credential, name });
+                if (insertError) {
+                    // Se outra pessoa cadastrou esse passaporte enquanto a página estava aberta.
+                    if (insertError.code === '23505' || /duplicate/i.test(insertError.message || '')) {
+                        await loadRemoteData();
+                        const existing = members.find(member => String(member.passport) === credential);
+                        if (existing) {
+                            currentSession = { ...existing, isManager: false };
+                            managerUnlocked = false;
+                            enterSystem();
+                            return;
+                        }
+                    }
+                    throw insertError;
+                }
+
+                members = [...members, { passport: credential, name }];
+                currentSession = { passport: credential, name, isManager: false };
+                managerUnlocked = false;
+                enterSystem();
+                showToast('Cadastro criado com sucesso!');
+            } catch (error) {
+                console.error(error);
+                showEntryError('Não foi possível conectar ao banco de dados. Tente novamente em instantes.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+
+        function enterSystem() {
+            document.getElementById('entryGate').classList.add('hidden');
+            document.getElementById('sessionBadge').textContent = currentSession.isManager
+                ? 'GERÊNCIA MASTER'
+                : `${currentSession.name} • Passaporte ${currentSession.passport}`;
+            document.getElementById('logoutBtn').classList.remove('hidden');
+            document.getElementById('refreshBtn').classList.remove('hidden');
+            updateSyncBadge(syncState);
+
+            // Campo do membro fica vinculado à sessão.
+            const memberField = document.getElementById('memberName');
+            memberField.value = currentSession.name;
+            memberField.readOnly = true;
+            memberField.classList.add('opacity-70');
+            const memberLabel = memberField.closest('div').parentElement.querySelector('label');
+            if (memberLabel) memberLabel.textContent = 'Membro identificado pela sessão';
+
+            const managerOnlyIds = ['exportBtn', 'clearHistoryBtn', 'catalogManagerBtn', 'importBtn'];
+            if (managerUnlocked && currentSession.isManager) {
+                document.getElementById('managerGoalsSection').classList.remove('hidden');
+                document.getElementById('managerHistorySection').classList.remove('hidden');
+                managerOnlyIds.forEach(id => document.getElementById(id).classList.remove('hidden'));
+                document.getElementById('globalWeeklyGoalInput').value = settings.global_goal || '';
+            } else {
+                document.getElementById('managerGoalsSection').classList.add('hidden');
+                document.getElementById('managerHistorySection').classList.add('hidden');
+                managerOnlyIds.forEach(id => document.getElementById(id).classList.add('hidden'));
+            }
+
+            renderAll();
+        }
+
+        function logoutSession() {
+            managerUnlocked = false;
+            managerPassword = null;
+            currentSession = null;
+            document.getElementById('entryCredential').value = '';
+            document.getElementById('firstRegistrationName').value = '';
+            document.getElementById('firstRegistrationName').classList.add('hidden');
+            document.getElementById('firstRegistrationName').required = false;
+            document.getElementById('entrySubmitBtn').textContent = 'Acessar sistema';
+            document.getElementById('sessionBadge').textContent = '';
+            document.getElementById('logoutBtn').classList.add('hidden');
+            document.getElementById('refreshBtn').classList.add('hidden');
+            document.getElementById('syncBadge').classList.add('hidden');
+            ['exportBtn', 'clearHistoryBtn', 'catalogManagerBtn', 'importBtn'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('entryGate').classList.remove('hidden');
+            hideEntryError();
+        }
+
+        async function managerAction(action) {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            try {
+                await action();
+            } catch (error) {
+                console.error(error);
+                showToast(error && error.message ? error.message : 'Não foi possível concluir a ação.', true);
+            }
+        }
+
+        function renderAll() {
+            renderCatalogSelects();
+            renderStock();
+            renderGoals();
+            renderHistory();
+            lucide.createIcons();
+        }
+
+        window.onload = async function () {
+            lucide.createIcons();
+            if (!CONFIGURED) {
+                showEntryError('Banco de dados ainda não configurado. Siga o GUIA-CONFIGURACAO.md.');
+                document.getElementById('entrySubmitBtn').disabled = true;
+                return;
+            }
+            const ok = await loadRemoteData();
+            renderAll();
+            if (!ok) {
+                showEntryError('Não foi possível conectar ao banco. Confira a internet e recarregue a página.');
+            }
+            document.getElementById('entryCredential').focus();
+        };
+
+        // Mantém a tela atualizada quando várias pessoas usam ao mesmo tempo.
+        setInterval(() => {
+            if (currentSession && document.visibilityState === 'visible') refreshData(true);
+        }, 60000);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && currentSession) refreshData(true);
+        });
+
+        // ---------- metas ----------
+        async function saveGlobalGoal() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+            const value = Number(document.getElementById('globalWeeklyGoalInput').value);
+            if (!Number.isSafeInteger(value) || value <= 0) {
+                showToast('Informe uma meta semanal inteira maior que zero.', true);
+                return;
+            }
+            try {
+                const { error } = await sb.rpc('farm_set_goal', { p_password: managerPassword, p_goal: value });
+                if (error) throw error;
+                settings.global_goal = value;
+                renderGoals();
+                showToast(`Meta geral definida: ${value.toLocaleString('pt-BR')} por item.`);
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível salvar a meta geral.', true);
+            }
+        }
+
+        async function resetWeeklyGoals() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+            if (!confirm('Resetar o progresso semanal de todos os membros e itens? O histórico e o estoque serão mantidos.')) return;
+            try {
+                const { data, error } = await sb.rpc('farm_reset_week', { p_password: managerPassword });
+                if (error) throw error;
+                settings.reset_at = data || new Date().toISOString();
+                renderGoals();
+                showToast('Progresso semanal resetado para todos!');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível salvar o reset semanal.', true);
+            }
+        }
+
+        function calculateStock() {
+            const stock = {};
+            catalog.forEach(item => { stock[item] = 0; });
+
+            logs.forEach(log => {
+                if (stock[log.item] !== undefined) {
+                    if (log.operation === 'ENTRY') stock[log.item] += Number(log.quantity) || 0;
+                    if (log.operation === 'EXIT') stock[log.item] -= Number(log.quantity) || 0;
+                }
+            });
+
+            return stock;
+        }
+
+        function getMemberProgress(passport, itemName, memberName = '') {
+            const resetAt = goalResetTimestamp();
+            let total = 0;
+            logs.forEach(log => {
+                const sameMember = String(log.passport || '') === String(passport) ||
+                    (!log.passport && String(log.member || '').trim().toLowerCase() === String(memberName).trim().toLowerCase());
+                const logTime = new Date(log.created_at).getTime() || 0;
+                if (sameMember && log.item === itemName && logTime > resetAt) {
+                    if (log.operation === 'ENTRY') total += Number(log.quantity) || 0;
+                    if (log.operation === 'EXIT') total -= Number(log.quantity) || 0;
+                }
+            });
+            return Math.max(0, total);
+        }
+
+        // ---------- renderizações ----------
+        function renderStock() {
+            const stockGrid = document.getElementById('stockGrid');
+            const totals = calculateStock();
+            stockGrid.innerHTML = '';
+
+            if (!catalog.length) {
+                stockGrid.innerHTML = '<p class="col-span-full text-center text-xs text-slate-500 py-6">Nenhum item no catálogo. A gerência precisa cadastrar os itens.</p>';
+                return;
+            }
+
+            catalog.forEach(item => {
+                const amount = totals[item] || 0;
+                const isNegative = amount < 0;
+
+                const card = document.createElement('div');
+                card.className = `bg-brand-cardBg border ${isNegative ? 'border-red-900/50' : 'border-brand-border'} rounded-xl p-4 shadow-md flex flex-col justify-between hover:border-emerald-500/40 transition`;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-bold tracking-wider uppercase truncate">${escapeHtml(item)}</span>
+                        <i data-lucide="package" class="w-4 h-4 text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold ${isNegative ? 'text-red-400' : 'text-white'}">
+                            ${amount.toLocaleString('pt-BR')}
+                        </span>
+                        <span class="text-xs text-slate-500 ml-1">unidades</span>
+                    </div>
+                `;
+                stockGrid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderGoals() {
+            const body = document.getElementById('managerReportBody');
+            const empty = document.getElementById('managerReportEmpty');
+            const summary = document.getElementById('managerSummary');
+            if (!body || !empty || !summary) return;
+
+            body.innerHTML = '';
+            summary.innerHTML = '';
+
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+
+            const goal = Number(settings.global_goal) || 0;
+            const totalRows = members.length * catalog.length;
+
+            if (!members.length || !catalog.length || goal <= 0) {
+                empty.classList.remove('hidden');
+                empty.textContent = !members.length
+                    ? 'Nenhum membro cadastrado ainda.'
+                    : (!catalog.length ? 'Cadastre itens no catálogo.' : 'Defina a meta semanal geral para gerar o relatório.');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            let completed = 0;
+            let sumPercent = 0;
+            const rows = [];
+
+            members.forEach(member => {
+                catalog.forEach(item => {
+                    const amount = getMemberProgress(member.passport, item, member.name);
+                    const rawPercent = (amount / goal) * 100;
+                    const percent = Math.round(rawPercent);
+                    const done = amount >= goal;
+                    if (done) completed++;
+                    sumPercent += Math.min(100, rawPercent);
+                    rows.push({ member, item, amount, percent, done });
+                });
+            });
+
+            const average = totalRows ? Math.round(sumPercent / totalRows) : 0;
+            const cards = [
+                { label: 'Membros cadastrados', value: members.length.toLocaleString('pt-BR'), icon: 'users' },
+                { label: 'Metas concluídas', value: `${completed} / ${totalRows}`, icon: 'trophy' },
+                { label: 'Progresso médio', value: `${average}%`, icon: 'chart-no-axes-column-increasing' }
+            ];
+            cards.forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4';
+                el.innerHTML = `<div class="flex items-center justify-between text-slate-400 text-[11px]"><span>${card.label}</span><i data-lucide="${card.icon}" class="w-4 h-4 text-purple-400"></i></div><div class="text-2xl font-extrabold text-white mt-2">${card.value}</div>`;
+                summary.appendChild(el);
+            });
+
+            rows.sort((a, b) => a.member.name.localeCompare(b.member.name, 'pt-BR') || a.item.localeCompare(b.item, 'pt-BR'));
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const width = Math.min(100, row.percent);
+                tr.innerHTML = `
+                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(row.member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(row.member.passport)}</div></td>
+                    <td class="px-3 py-3">${escapeHtml(row.item)}</td>
+                    <td class="px-3 py-3 font-mono text-white">${row.amount.toLocaleString('pt-BR')}</td>
+                    <td class="px-3 py-3 font-mono">${goal.toLocaleString('pt-BR')}</td>
+                    <td class="px-3 py-3 min-w-[150px]"><div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${row.done ? 'bg-emerald-500' : 'bg-purple-500'}" style="width:${width}%"></div></div><span class="font-bold ${row.done ? 'text-emerald-400' : 'text-slate-300'}">${row.percent}%</span></div></td>
+                    <td class="px-3 py-3">${row.done ? '<span class="text-emerald-400 font-bold">Concluída</span>' : '<span class="text-amber-400">Em andamento</span>'}</td>`;
+                body.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function renderHistory() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+            const tbody = document.getElementById('historyTableBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const emptyMsg = document.getElementById('emptyHistoryMsg');
+            const limitMsg = document.getElementById('historyLimitMsg');
+
+            tbody.innerHTML = '';
+            limitMsg.classList.add('hidden');
+
+            const filteredLogs = logs.filter(log =>
+                String(log.member || '').toLowerCase().includes(search) ||
+                String(log.item || '').toLowerCase().includes(search)
+            );
+
+            if (filteredLogs.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            emptyMsg.classList.add('hidden');
+
+            const visibleLogs = filteredLogs.slice(0, HISTORY_RENDER_LIMIT);
+            if (filteredLogs.length > visibleLogs.length) {
+                limitMsg.textContent = `Mostrando os ${visibleLogs.length} registros mais recentes de ${filteredLogs.length}. Use a busca ou exporte o CSV para ver todos.`;
+                limitMsg.classList.remove('hidden');
+            }
+
+            visibleLogs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-900/60 transition';
+                const isEntry = log.operation === 'ENTRY';
+
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-slate-400 text-[11px] font-mono">${escapeHtml(formatDateTime(log.created_at))}</td>
+                    <td class="py-3 px-3 font-semibold text-white">${escapeHtml(log.member)}</td>
+                    <td class="py-3 px-3"><span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[11px] font-mono border border-slate-700">${escapeHtml(log.item)}</span></td>
+                    <td class="py-3 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${isEntry ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' : 'bg-red-950/60 text-red-400 border-red-800'}">
+                            ${isEntry ? '+ ENTRADA' : '- SAÍDA'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 text-right font-mono font-bold ${isEntry ? 'text-emerald-400' : 'text-red-400'}">
+                        ${isEntry ? '+' : '-'}${Number(log.quantity || 0).toLocaleString('pt-BR')}
+                    </td>
+                    <td class="py-3 px-3 text-center"></td>
+                    <td class="py-3 px-3 text-center">
+                        <button type="button" class="delete-log-btn text-slate-500 hover:text-red-400 p-1" title="Excluir este registro">
+                            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </td>
+                `;
+
+                const photoCell = tr.children[5];
+                const photoUrl = log.image_url || log.image || '';
+                if (photoUrl) {
+                    const photoButton = document.createElement('button');
+                    photoButton.type = 'button';
+                    photoButton.className = 'inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-[11px] font-semibold bg-emerald-950/50 border border-emerald-800/60 px-2.5 py-1 rounded-lg';
+                    photoButton.innerHTML = '<i data-lucide="image" class="w-3.5 h-3.5"></i> Ver Print';
+                    photoButton.addEventListener('click', () => openImageModal(photoUrl));
+                    photoCell.appendChild(photoButton);
+                } else {
+                    photoCell.innerHTML = '<span class="text-slate-600 text-[11px]">Sem foto</span>';
+                }
+
+                tr.querySelector('.delete-log-btn').addEventListener('click', () => deleteLog(log.id));
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        async function deleteLog(id) {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            if (!confirm('Excluir este registro? O estoque será recalculado.')) return;
+            try {
+                const { error } = await sb.rpc('farm_delete_log', { p_password: managerPassword, p_id: id });
+                if (error) throw error;
+                logs = logs.filter(log => log.id !== id);
+                renderStock();
+                renderGoals();
+                renderHistory();
+                showToast('Registro excluído!');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível excluir o registro.', true);
+            }
+        }
+
+        async function clearHistory() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            if (!confirm('Deseja apagar TODO o histórico? Isso irá zerar o estoque e o progresso das metas.')) return;
+            try {
+                const { error } = await sb.rpc('farm_clear_logs', { p_password: managerPassword });
+                if (error) throw error;
+                logs = [];
+                renderStock();
+                renderGoals();
+                renderHistory();
+                showToast('Histórico resetado!');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível resetar o histórico.', true);
+            }
+        }
+
+        // ---------- catálogo ----------
+        function renderCatalogSelects() {
+            const select = document.getElementById('itemSelect');
+            if (!select) return;
+            const previous = select.value;
+            select.innerHTML = '';
+
+            if (!catalog.length) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Nenhum item cadastrado';
+                select.appendChild(option);
+                return;
+            }
+
+            catalog.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                select.appendChild(option);
+            });
+
+            if (previous && catalog.includes(previous)) select.value = previous;
+        }
+
+        function openCatalogModal() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            renderCatalogList();
+            document.getElementById('catalogModal').classList.remove('hidden');
+        }
+
+        function closeCatalogModal() {
+            document.getElementById('catalogModal').classList.add('hidden');
+        }
+
+        function renderCatalogList() {
+            const container = document.getElementById('catalogList');
+            container.innerHTML = '';
+
+            if (!catalog.length) {
+                container.innerHTML = '<p class="text-xs text-slate-500 text-center py-3">Nenhum item cadastrado.</p>';
+                return;
+            }
+
+            catalog.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-center justify-between p-2 bg-slate-900 border border-slate-800 rounded-lg text-xs';
+                itemDiv.innerHTML = `
+                    <span class="font-medium text-slate-200">${escapeHtml(item)}</span>
+                    <button class="remove-catalog-item text-slate-500 hover:text-red-400" title="Remover item">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                    </button>
+                `;
+                itemDiv.querySelector('.remove-catalog-item').addEventListener('click', () => removeCatalogItem(item));
+                container.appendChild(itemDiv);
+            });
+            lucide.createIcons();
+        }
+
+        async function addNewCatalogItem() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            const input = document.getElementById('newItemInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (catalog.some(item => item.toLowerCase() === name.toLowerCase())) {
+                showToast('Este item já existe no catálogo.', true);
+                return;
+            }
+
+            try {
+                const { error } = await sb.rpc('farm_add_catalog', { p_password: managerPassword, p_name: name });
+                if (error) throw error;
+                catalog.push(name);
+                input.value = '';
+                renderCatalogSelects();
+                renderCatalogList();
+                renderStock();
+                showToast('Novo item cadastrado!');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível adicionar o item.', true);
+            }
+        }
+
+        async function removeCatalogItem(name) {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            if (!confirm(`Remover o item "${name}" do catálogo? Os registros antigos continuam no histórico.`)) return;
+
+            try {
+                const { error } = await sb.rpc('farm_remove_catalog', { p_password: managerPassword, p_name: name });
+                if (error) throw error;
+                catalog = catalog.filter(item => item !== name);
+                renderCatalogSelects();
+                renderCatalogList();
+                renderStock();
+                renderGoals();
+                showToast('Item removido do catálogo.');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível remover o item.', true);
+            }
+        }
+
+        // ---------- foto ----------
+        function compressImage(file, maxSize = 1280, quality = 0.72) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onerror = () => reject(new Error('Não foi possível ler a imagem.'));
@@ -596,7 +1126,13 @@
                             return;
                         }
                         context.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
+                        canvas.toBlob(blob => {
+                            if (!blob) {
+                                reject(new Error('Não foi possível compactar a imagem.'));
+                                return;
+                            }
+                            resolve({ blob, dataUrl: canvas.toDataURL('image/jpeg', quality) });
+                        }, 'image/jpeg', quality);
                     };
                     img.src = event.target.result;
                 };
@@ -614,41 +1150,61 @@
                 return;
             }
 
-            // O limite original de 3 MB é mantido para evitar arquivos enormes na entrada.
-            if (file.size > 3 * 1024 * 1024) {
-                showToast('A imagem original deve ter no máximo 3MB!', true);
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('A imagem deve ter no máximo 10MB.', true);
                 event.target.value = '';
                 return;
             }
 
             try {
-                currentImageData = await compressImage(file);
-                document.getElementById('imagePreview').src = currentImageData;
+                const { blob, dataUrl } = await compressImage(file);
+                currentImageBlob = blob;
+                document.getElementById('imagePreview').src = dataUrl;
                 document.getElementById('previewContainer').classList.remove('hidden');
-                const kb = Math.round((currentImageData.length * 3 / 4) / 1024);
-                showToast(`Foto preparada (${kb} KB).`);
+                showToast(`Foto pronta (${Math.max(1, Math.round(blob.size / 1024))} KB).`);
             } catch (error) {
                 console.error(error);
-                currentImageData = null;
+                currentImageBlob = null;
                 event.target.value = '';
                 showToast(error.message || 'Erro ao preparar a foto.', true);
             }
         }
 
         function removeImagePreview() {
-            currentImageData = null;
+            currentImageBlob = null;
             document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreview').src = '';
             document.getElementById('previewContainer').classList.add('hidden');
         }
 
-        // SUBMIT DO FORMULÁRIO DE LANÇAMENTO
-        function handleFormSubmit(e) {
-            e.preventDefault();
+        async function uploadPrint(blob, passport) {
+            const folder = String(passport || 'membro').replace(/[^0-9A-Za-z_-]/g, '') || 'membro';
+            const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
 
+            const { error } = await sb.storage.from('prints').upload(path, blob, {
+                contentType: 'image/jpeg',
+                cacheControl: '31536000',
+                upsert: false
+            });
+            if (error) throw error;
+
+            const { data } = sb.storage.from('prints').getPublicUrl(path);
+            return data.publicUrl;
+        }
+
+        // ---------- registro de farm ----------
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+
+            if (!sb) {
+                showToast('Banco de dados não configurado.', true);
+                return;
+            }
             if (!currentSession || currentSession.isManager) {
                 showToast('Entre com seu passaporte de membro para registrar farm.', true);
                 return;
             }
+
             const member = currentSession.name;
             const passport = currentSession.passport;
             const item = document.getElementById('itemSelect').value;
@@ -660,329 +1216,52 @@
                 showToast('Preencha os campos corretamente.', true);
                 return;
             }
-
-            if (!currentImageData) {
+            if (!currentImageBlob) {
                 showToast('É obrigatório anexar a foto do baú!', true);
                 return;
             }
 
-            const newLog = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleString('pt-BR'),
-                member,
-                passport,
-                item,
-                operation,
-                quantity,
-                image: currentImageData
-            };
-
-            // Primeiro grava o histórico. Só atualiza a tela/estoque se o navegador aceitar.
-            const previousLogs = logs;
-            const nextLogs = [newLog, ...previousLogs];
+            const form = document.getElementById('farmForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando foto e registro...';
 
             try {
-                localStorage.setItem('gta_farm_logs_v2', JSON.stringify(nextLogs));
-                logs = nextLogs;
+                const imageUrl = await uploadPrint(currentImageBlob, passport);
+
+                const { data, error } = await sb.from('farm_logs').insert({
+                    passport,
+                    member,
+                    item,
+                    operation,
+                    quantity,
+                    image_url: imageUrl
+                }).select('id,created_at,passport,member,item,operation,quantity,image_url').single();
+
+                if (error) throw error;
+
+                logs = [data, ...logs];
+                form.reset();
+                removeImagePreview();
+                document.getElementById('memberName').value = currentSession.name;
+                renderAll();
+                showToast('Farm registrado com sucesso!');
             } catch (error) {
-                logs = previousLogs;
-                console.error('Falha ao salvar o histórico:', error);
-                if (error && (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
-                    showToast('Armazenamento do navegador cheio. Exporte o histórico e libere espaço antes de registrar.', true);
+                console.error(error);
+                if (error && error.message && /row-level security/i.test(error.message)) {
+                    showToast('Seu passaporte não está cadastrado no banco. Saia e entre novamente.', true);
                 } else {
-                    showToast('Não foi possível salvar o registro. Nenhum estoque foi alterado.', true);
+                    showToast(error && error.message ? error.message : 'Não foi possível salvar o registro.', true);
                 }
-                return;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHtml;
+                lucide.createIcons();
             }
-
-            document.getElementById('farmForm').reset();
-            removeImagePreview();
-
-            renderStock();
-            renderGoals();
-            renderHistory();
-            showToast('Farm registrado com sucesso!');
         }
 
-        // CALCULOS DE ESTOQUE GERAL
-        function calculateStock() {
-            const stock = {};
-            catalog.forEach(item => stock[item] = 0);
-
-            logs.forEach(log => {
-                if (stock[log.item] !== undefined) {
-                    if (log.operation === 'ENTRY') stock[log.item] += log.quantity;
-                    if (log.operation === 'EXIT') stock[log.item] -= log.quantity;
-                }
-            });
-
-            return stock;
-        }
-
-        // CALCULOS DE ENTREGA INDIVIDUAL DE CADA MEMBRO (PARA A META)
-        function getMemberProgress(passport, itemName, memberName = '') {
-            let total = 0;
-            logs.forEach(log => {
-                const sameMember = String(log.passport || '') === String(passport) ||
-                    (!log.passport && String(log.member || '').trim().toLowerCase() === String(memberName).trim().toLowerCase());
-                if (Number(log.id) > goalResetLogId && sameMember && log.item === itemName) {
-                    if (log.operation === 'ENTRY') total += Number(log.quantity) || 0;
-                    if (log.operation === 'EXIT') total -= Number(log.quantity) || 0;
-                }
-            });
-            return Math.max(0, total);
-        }
-
-        // RENDERIZAR ESTOQUE
-        function renderStock() {
-            const stockGrid = document.getElementById('stockGrid');
-            const totals = calculateStock();
-            stockGrid.innerHTML = '';
-
-            catalog.forEach(item => {
-                const amount = totals[item] || 0;
-                const isNegative = amount < 0;
-                
-                const card = document.createElement('div');
-                card.className = `bg-brand-cardBg border ${isNegative ? 'border-red-900/50' : 'border-brand-border'} rounded-xl p-4 shadow-md flex flex-col justify-between hover:border-emerald-500/40 transition`;
-                card.innerHTML = `
-                    <div class="flex items-center justify-between text-slate-400 mb-2">
-                        <span class="text-xs font-bold tracking-wider uppercase truncate">${item}</span>
-                        <i data-lucide="package" class="w-4 h-4 text-emerald-400"></i>
-                    </div>
-                    <div>
-                        <span class="text-xl font-extrabold ${isNegative ? 'text-red-400' : 'text-white'}">
-                            ${amount.toLocaleString('pt-BR')}
-                        </span>
-                        <span class="text-xs text-slate-500 ml-1">unidades</span>
-                    </div>
-                `;
-                stockGrid.appendChild(card);
-            });
-            lucide.createIcons();
-        }
-
-        // RELATÓRIO GERENCIAL: META ÚNICA APLICADA A CADA ITEM PARA CADA MEMBRO
-        function renderGoals() {
-            const body = document.getElementById('managerReportBody');
-            const empty = document.getElementById('managerReportEmpty');
-            const summary = document.getElementById('managerSummary');
-            if (!body || !empty || !summary) return;
-
-            body.innerHTML = '';
-            summary.innerHTML = '';
-
-            if (!managerUnlocked || !currentSession?.isManager) return;
-
-            const totalRows = members.length * catalog.length;
-            if (!members.length || !catalog.length || globalWeeklyGoal <= 0) {
-                empty.classList.remove('hidden');
-                empty.textContent = !members.length
-                    ? 'Nenhum membro cadastrado ainda.'
-                    : 'Defina a meta semanal geral para gerar o relatório.';
-                return;
-            }
-            empty.classList.add('hidden');
-
-            let completed = 0;
-            let sumPercent = 0;
-            const rows = [];
-
-            members.forEach(member => {
-                catalog.forEach(item => {
-                    const amount = getMemberProgress(member.passport, item, member.name);
-                    const rawPercent = (amount / globalWeeklyGoal) * 100;
-                    const percent = Math.round(rawPercent);
-                    const done = amount >= globalWeeklyGoal;
-                    if (done) completed++;
-                    sumPercent += Math.min(100, rawPercent);
-                    rows.push({ member, item, amount, percent, done });
-                });
-            });
-
-            const average = totalRows ? Math.round(sumPercent / totalRows) : 0;
-            const cards = [
-                { label: 'Membros cadastrados', value: members.length.toLocaleString('pt-BR'), icon: 'users' },
-                { label: 'Metas concluídas', value: `${completed} / ${totalRows}`, icon: 'trophy' },
-                { label: 'Progresso médio', value: `${average}%`, icon: 'chart-no-axes-column-increasing' }
-            ];
-            cards.forEach(card => {
-                const el = document.createElement('div');
-                el.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4';
-                el.innerHTML = `<div class="flex items-center justify-between text-slate-400 text-[11px]"><span>${card.label}</span><i data-lucide="${card.icon}" class="w-4 h-4 text-purple-400"></i></div><div class="text-2xl font-extrabold text-white mt-2">${card.value}</div>`;
-                summary.appendChild(el);
-            });
-
-            rows.sort((a,b) => a.member.name.localeCompare(b.member.name, 'pt-BR') || a.item.localeCompare(b.item, 'pt-BR'));
-            rows.forEach(row => {
-                const tr = document.createElement('tr');
-                const width = Math.min(100, row.percent);
-                tr.innerHTML = `
-                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(row.member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(row.member.passport)}</div></td>
-                    <td class="px-3 py-3">${escapeHtml(row.item)}</td>
-                    <td class="px-3 py-3 font-mono text-white">${row.amount.toLocaleString('pt-BR')}</td>
-                    <td class="px-3 py-3 font-mono">${globalWeeklyGoal.toLocaleString('pt-BR')}</td>
-                    <td class="px-3 py-3 min-w-[150px]"><div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${row.done ? 'bg-emerald-500' : 'bg-purple-500'}" style="width:${width}%"></div></div><span class="font-bold ${row.done ? 'text-emerald-400' : 'text-slate-300'}">${row.percent}%</span></div></td>
-                    <td class="px-3 py-3">${row.done ? '<span class="text-emerald-400 font-bold">Concluída</span>' : '<span class="text-amber-400">Em andamento</span>'}</td>`;
-                body.appendChild(tr);
-            });
-            lucide.createIcons();
-        }
-
-        // Funções antigas de meta individual ficam desativadas por compatibilidade.
-        function openGoalModal() { showToast('Agora a meta é única e definida no painel da gerência.', true); }
-        function closeGoalModal() {}
-        function handleSaveGoal(e) { e.preventDefault(); }
-        function deleteGoal(index) {}
-
-        // RENDERIZAR HISTÓRICO
-        function renderHistory() {
-            if (!managerUnlocked || !currentSession?.isManager) return;
-            const tbody = document.getElementById('historyTableBody');
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const emptyMsg = document.getElementById('emptyHistoryMsg');
-
-            tbody.innerHTML = '';
-
-            const filteredLogs = logs.filter(log =>
-                String(log.member || '').toLowerCase().includes(search) ||
-                String(log.item || '').toLowerCase().includes(search)
-            );
-
-            if (filteredLogs.length === 0) {
-                emptyMsg.classList.remove('hidden');
-                return;
-            }
-            emptyMsg.classList.add('hidden');
-
-            filteredLogs.forEach(log => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-900/60 transition';
-                const isEntry = log.operation === 'ENTRY';
-
-                tr.innerHTML = `
-                    <td class="py-3 px-3 text-slate-400 text-[11px] font-mono">${escapeHtml(String(log.timestamp || ''))}</td>
-                    <td class="py-3 px-3 font-semibold text-white">${escapeHtml(String(log.member || ''))}</td>
-                    <td class="py-3 px-3"><span class="bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-[11px] font-mono border border-slate-700">${escapeHtml(String(log.item || ''))}</span></td>
-                    <td class="py-3 px-3 text-center">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${isEntry ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' : 'bg-red-950/60 text-red-400 border-red-800'}">
-                            ${isEntry ? '+ ENTRADA' : '- SAÍDA'}
-                        </span>
-                    </td>
-                    <td class="py-3 px-3 text-right font-mono font-bold ${isEntry ? 'text-emerald-400' : 'text-red-400'}">
-                        ${isEntry ? '+' : '-'}${Number(log.quantity || 0).toLocaleString('pt-BR')}
-                    </td>
-                    <td class="py-3 px-3 text-center"></td>
-                    <td class="py-3 px-3 text-center">
-                        <button type="button" class="delete-log-btn text-slate-500 hover:text-red-400 p-1" title="Excluir este registro">
-                            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-                        </button>
-                    </td>
-                `;
-
-                const photoCell = tr.children[5];
-                if (log.image) {
-                    const photoButton = document.createElement('button');
-                    photoButton.type = 'button';
-                    photoButton.className = 'inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 text-[11px] font-semibold bg-emerald-950/50 border border-emerald-800/60 px-2.5 py-1 rounded-lg';
-                    photoButton.innerHTML = '<i data-lucide="image" class="w-3.5 h-3.5"></i> Ver Print';
-                    photoButton.addEventListener('click', () => openImageModal(log.image));
-                    photoCell.appendChild(photoButton);
-                } else {
-                    photoCell.innerHTML = '<span class="text-slate-600 text-[11px]">Sem foto</span>';
-                }
-
-                tr.querySelector('.delete-log-btn').addEventListener('click', () => deleteLog(log.id));
-                tbody.appendChild(tr);
-            });
-            lucide.createIcons();
-        }
-
-        function deleteLog(id) {
-            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
-            logs = logs.filter(log => log.id !== id);
-            saveData();
-            renderStock();
-            renderGoals();
-            renderHistory();
-            showToast('Registro excluído!');
-        }
-
-        // CATÁLOGO DE ITENS
-        function renderCatalogSelects() {
-            const selects = [document.getElementById('itemSelect'), document.getElementById('goalItemSelect')];
-            selects.forEach(select => {
-                if(!select) return;
-                select.innerHTML = '';
-                catalog.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item;
-                    opt.textContent = item;
-                    select.appendChild(opt);
-                });
-            });
-        }
-
-        function openCatalogModal() {
-            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
-            renderCatalogList();
-            document.getElementById('catalogModal').classList.remove('hidden');
-        }
-
-        function closeCatalogModal() {
-            document.getElementById('catalogModal').classList.add('hidden');
-        }
-
-        function renderCatalogList() {
-            const container = document.getElementById('catalogList');
-            container.innerHTML = '';
-            
-            catalog.forEach((item, index) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'flex items-center justify-between p-2 bg-slate-900 border border-slate-800 rounded-lg text-xs';
-                itemDiv.innerHTML = `
-                    <span class="font-medium text-slate-200">${item}</span>
-                    <button onclick="removeCatalogItem(${index})" class="text-slate-500 hover:text-red-400">
-                        <i data-lucide="x-circle" class="w-4 h-4"></i>
-                    </button>
-                `;
-                container.appendChild(itemDiv);
-            });
-            lucide.createIcons();
-        }
-
-        function addNewCatalogItem() {
-            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
-            const input = document.getElementById('newItemInput');
-            const name = input.value.trim();
-
-            if (!name) return;
-
-            if (catalog.some(i => i.toLowerCase() === name.toLowerCase())) {
-                showToast('Este item já existe no catálogo.', true);
-                return;
-            }
-
-            catalog.push(name);
-            input.value = '';
-            saveData();
-            renderCatalogSelects();
-            renderCatalogList();
-            renderStock();
-            showToast('Novo item cadastrado!');
-        }
-
-        function removeCatalogItem(index) {
-            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
-            catalog.splice(index, 1);
-            saveData();
-            renderCatalogSelects();
-            renderCatalogList();
-            renderStock();
-            showToast('Item removido do catálogo.');
-        }
-
-        // VISUALIZAÇÃO DE FOTO
+        // ---------- modais ----------
         function openImageModal(imgSrc) {
             document.getElementById('modalImg').src = imgSrc;
             document.getElementById('imageModal').classList.remove('hidden');
@@ -990,48 +1269,183 @@
 
         function closeImageModal() {
             document.getElementById('imageModal').classList.add('hidden');
+            document.getElementById('modalImg').src = '';
         }
 
-        // EXPORTAR CSV
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                closeImageModal();
+                closeCatalogModal();
+            }
+        });
+
+        // ---------- exportar CSV ----------
         function exportData() {
-            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
             if (logs.length === 0) {
                 showToast('Sem registros para exportar.', true);
                 return;
             }
 
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Data/Hora;Membro;Item;Operacao;Quantidade\n";
+            let csvContent = "Data/Hora;Membro;Passaporte;Item;Operacao;Quantidade\n";
 
             logs.forEach(log => {
                 const op = log.operation === 'ENTRY' ? 'Entrada' : 'Saida';
-                csvContent += `"${log.timestamp}";"${log.member}";"${log.item}";"${op}";${log.quantity}\n`;
+                csvContent += `"${formatDateTime(log.created_at)}";"${log.member}";"${log.passport || ''}";"${log.item}";"${op}";${log.quantity}\n`;
             });
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `farm_faccao_${new Date().toISOString().slice(0,10)}.csv`);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `farm_faccao_${new Date().toISOString().slice(0, 10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
-        // RESETAR HISTÓRICO
-        function clearHistory() {
-            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
-            if (confirm("Deseja apagar TODO o histórico? Isso irá zerar o estoque e o progresso das metas.")) {
-                logs = [];
-                saveData();
-                renderStock();
-                renderGoals();
-                renderHistory();
-                showToast('Histórico resetado!');
+        // ---------- importar dados que estavam no navegador (localStorage) ----------
+        async function importOldLocalData() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
             }
-        }
 
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            const oldCatalog = parseJSON(localStorage.getItem('gta_farm_catalog_v2'), []);
+            const oldMembers = parseJSON(localStorage.getItem('gta_farm_members_v1'), []);
+            const oldLogs = parseJSON(localStorage.getItem('gta_farm_logs_v2'), []);
+            const oldGoal = Number(localStorage.getItem('gta_farm_global_goal_v1')) || 0;
+            const oldResetId = Number(localStorage.getItem('gta_farm_goal_reset_id_v2')) || 0;
+
+            const totalOld = oldCatalog.length + oldMembers.length + oldLogs.length;
+            if (!totalOld && !oldGoal) {
+                showToast('Nenhum dado antigo encontrado neste navegador.', true);
+                return;
+            }
+
+            const resumo = `Encontrei dados antigos salvos neste navegador:\n\n` +
+                `• ${oldMembers.length} membro(s)\n` +
+                `• ${oldCatalog.length} item(ns) no catálogo\n` +
+                `• ${oldLogs.length} registro(s) de farm\n` +
+                `• Meta geral: ${oldGoal ? oldGoal.toLocaleString('pt-BR') : 'não definida'}\n\n` +
+                `Deseja copiar tudo para o banco de dados na nuvem? As fotos também serão enviadas.`;
+
+            if (!confirm(resumo)) return;
+            if (logs.length > 0 && !confirm('O banco já tem registros. Importar mesmo assim pode duplicar dados. Continuar?')) return;
+
+            const importBtn = document.getElementById('importBtn');
+            const originalHtml = importBtn.innerHTML;
+            importBtn.disabled = true;
+            importBtn.textContent = 'Importando...';
+
+            let importedMembers = 0;
+            let importedLogs = 0;
+            let skipped = 0;
+
+            try {
+                // 1) Itens do catálogo
+                for (const rawName of oldCatalog) {
+                    const name = String(rawName || '').trim();
+                    if (!name || name.length > 60) continue;
+                    if (catalog.some(item => item.toLowerCase() === name.toLowerCase())) continue;
+                    const { error } = await sb.rpc('farm_add_catalog', { p_password: managerPassword, p_name: name });
+                    if (error) console.warn('Catálogo:', name, error.message);
+                }
+
+                // 2) Meta geral e data do último reset
+                if (oldGoal > 0) {
+                    const { error } = await sb.rpc('farm_set_goal', { p_password: managerPassword, p_goal: Number(oldGoal) });
+                    if (error) console.warn('Meta:', error.message);
+                }
+                if (oldResetId > 0) {
+                    const resetIso = new Date(oldResetId).toISOString();
+                    const { error } = await sb.rpc('farm_set_reset_at', { p_password: managerPassword, p_reset_at: resetIso });
+                    if (error) console.warn('Reset:', error.message);
+                }
+
+                // 3) Membros
+                for (const member of oldMembers) {
+                    const passport = String((member && member.passport) || '').trim();
+                    if (!/^\d{1,10}$/.test(passport)) { skipped++; continue; }
+                    if (members.some(item => String(item.passport) === passport)) continue;
+
+                    const name = String((member && member.name) || 'Membro').slice(0, 60).trim();
+                    const { error } = await sb.from('farm_members').insert({ passport, name });
+                    if (error) {
+                        console.warn('Membro:', passport, error.message);
+                        skipped++;
+                    } else {
+                        importedMembers++;
+                    }
+                }
+
+                // 4) Registros (do mais antigo para o mais novo) + fotos
+                const orderedLogs = [...oldLogs].reverse();
+                for (let index = 0; index < orderedLogs.length; index++) {
+                    const log = orderedLogs[index];
+                    if (index % 3 === 0) showToast(`Importando registros... ${index + 1}/${orderedLogs.length}`);
+
+                    if (!log || !log.item) { skipped++; continue; }
+
+                    let passport = log.passport ? String(log.passport).trim() : '';
+                    if (!passport) {
+                        const match = oldMembers.find(member => String((member && member.name) || '') === String(log.member || ''));
+                        passport = match ? String(match.passport || '').trim() : '';
+                    }
+                    if (!/^\d{1,10}$/.test(passport)) { skipped++; continue; }
+
+                    let imageUrl = null;
+                    if (log.image && String(log.image).startsWith('data:')) {
+                        try {
+                            const response = await fetch(log.image);
+                            const blob = await response.blob();
+                            imageUrl = await uploadPrint(blob, passport);
+                        } catch (photoError) {
+                            console.warn('Foto não pôde ser enviada:', photoError);
+                        }
+                    } else if (log.image && String(log.image).startsWith('http')) {
+                        imageUrl = String(log.image);
+                    }
+
+                    const createdRaw = Number(log.id);
+                    const createdAt = Number.isFinite(createdRaw) && createdRaw > 1000000000000
+                        ? new Date(createdRaw).toISOString()
+                        : new Date().toISOString();
+
+                    const { error } = await sb.from('farm_logs').insert({
+                        created_at: createdAt,
+                        passport,
+                        member: String(log.member || 'Membro').slice(0, 60),
+                        item: String(log.item).slice(0, 80),
+                        operation: log.operation === 'EXIT' ? 'EXIT' : 'ENTRY',
+                        quantity: Math.max(1, Number(log.quantity) || 1),
+                        image_url: imageUrl
+                    });
+
+                    if (error) {
+                        console.warn('Registro:', error.message);
+                        skipped++;
+                    } else {
+                        importedLogs++;
+                    }
+                }
+
+                await loadRemoteData();
+                renderAll();
+                document.getElementById('globalWeeklyGoalInput').value = settings.global_goal || '';
+                showToast(`Importação concluída: ${importedMembers} membro(s), ${importedLogs} registro(s).`);
+            } catch (error) {
+                console.error(error);
+                showToast('Erro durante a importação. Veja o console do navegador.', true);
+            } finally {
+                importBtn.disabled = false;
+                importBtn.innerHTML = originalHtml;
+                lucide.createIcons();
+            }
         }
     </script>
 </body>
