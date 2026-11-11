@@ -5,21 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>É OS GIVO - Gerenciador de Farm</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        darkbg: '#090d16',
-                        cardbg: '#111827',
-                        bordercolor: '#1e3a8a',
-                        neonblue: '#00f2fe',
-                        neonglow: '#38bdf8'
-                    }
-                }
-            }
-        }
-    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .neon-border {
@@ -31,58 +16,49 @@
         }
     </style>
 </head>
-<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased pb-12 selection:bg-cyan-500 selection:text-black">
+<body class="bg-[#090d16] text-slate-100 min-h-screen font-sans antialiased pb-12">
 
     <!-- TELA DE LOGIN -->
-    <div id="loginScreen" class="fixed inset-0 bg-[#060910]/95 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-        <div class="bg-cardbg neon-border p-8 rounded-2xl shadow-2xl max-w-sm w-full space-y-6 relative overflow-hidden">
-            <div class="absolute -top-12 -right-12 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl"></div>
-            
+    <div id="loginScreen" class="fixed inset-0 bg-[#060910] z-50 flex items-center justify-center p-4">
+        <div class="bg-[#111827] neon-border p-8 rounded-2xl shadow-2xl max-w-sm w-full space-y-6">
             <div class="text-center space-y-2">
-                <div class="w-20 h-20 mx-auto bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-2xl flex items-center justify-center border border-cyan-500/40 shadow-inner">
-                    <i class="fa-solid fa-crown text-cyan-400 text-3xl neon-text"></i>
+                <div class="w-16 h-16 mx-auto bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/30">
+                    <i class="fa-solid fa-crown text-cyan-400 text-2xl neon-text"></i>
                 </div>
-                <h1 class="text-2xl font-black tracking-wider uppercase text-white">É OS GIVO</h1>
-                <p class="text-xs text-cyan-400 font-semibold tracking-widest uppercase">Sistema de Farm & Baú</p>
+                <h1 class="text-xl font-black uppercase text-white">É OS GIVO</h1>
+                <p class="text-xs text-cyan-400 font-semibold tracking-wider uppercase">Controle de Farm & Baú</p>
             </div>
 
-            <form id="loginForm" class="space-y-4">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-cyan-400 uppercase mb-1">Seu ID / Passaporte (ou Senha Master)</label>
-                    <input type="text" id="loginPassport" required placeholder="Ex: 12" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 text-center font-bold tracking-widest transition shadow-inner">
+                    <label class="block text-xs font-bold text-cyan-400 uppercase mb-1">Seu ID ou Senha Master</label>
+                    <input type="text" id="loginPassport" placeholder="Ex: 12" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-400 text-center font-bold tracking-widest">
                 </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black py-3 px-4 rounded-xl text-sm transition shadow-lg shadow-cyan-900/40 cursor-pointer uppercase tracking-wider">
+                <button type="button" onclick="fazerLogin()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3 px-4 rounded-xl text-sm transition uppercase tracking-wider cursor-pointer shadow-lg shadow-cyan-900/40">
                     Acessar Painel
-                </button>
-            </form>
-            <div class="text-center pt-2">
-                <button type="button" onclick="hardResetSystem()" class="text-[10px] text-slate-500 hover:text-red-400 cursor-pointer transition">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Limpar cache e reiniciar dados
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- HEADER ESTILIZADO -->
-    <header class="bg-cardbg border-b border-cyan-900/40 shadow-2xl sticky top-0 z-40 backdrop-blur-md bg-opacity-90">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+    <!-- HEADER -->
+    <header class="bg-[#111827] border-b border-cyan-900/40 shadow-xl sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-gradient-to-br from-cyan-500/20 to-blue-600/20 text-cyan-400 p-3 rounded-xl border border-cyan-500/30 shadow-lg">
-                    <i class="fa-solid fa-gun text-2xl"></i>
+                <div class="bg-cyan-500/10 text-cyan-400 p-2.5 rounded-xl border border-cyan-500/30">
+                    <i class="fa-solid fa-gun text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-black tracking-wider uppercase text-white flex items-center gap-2">
-                        É OS GIVO <span class="text-[10px] bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full font-bold">RP VILA OLÍMPIA</span>
-                    </h1>
+                    <h1 class="text-base font-black tracking-wider uppercase text-white">É OS GIVO</h1>
                     <p class="text-xs text-slate-400">Operador: <span id="userSessionBadge" class="text-cyan-400 font-bold"></span></p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3">
-                <div id="managerIndicator" class="hidden items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-xl text-amber-400 text-xs font-extrabold uppercase tracking-wide shadow-lg">
-                    <i class="fa-solid fa-crown text-amber-400"></i> Gerente Master
+                <div id="managerIndicator" class="hidden items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl text-amber-400 text-xs font-extrabold uppercase">
+                    <i class="fa-solid fa-crown"></i> Gerente
                 </div>
-                <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5">
+                <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
                     <i class="fa-solid fa-right-from-bracket"></i> Sair
                 </button>
             </div>
@@ -92,234 +68,162 @@
     <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
 
         <!-- PAINEL DO GERENTE -->
-        <section id="managerPanel" class="bg-cardbg neon-border p-6 rounded-2xl shadow-2xl hidden space-y-6 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
-                <h2 class="text-base font-black flex items-center gap-2 text-amber-400 uppercase tracking-wide">
-                    <i class="fa-solid fa-user-shield"></i> Painel de Controle do Gerente
-                </h2>
-                <span class="text-[11px] bg-amber-500/10 text-amber-400 px-3 py-1 rounded-full border border-amber-500/20 font-bold uppercase">Área Restrita</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Definir Meta -->
-                <div class="space-y-3 bg-[#060910]/50 p-4 rounded-xl border border-slate-800">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Definir Meta Semanal por ID</h3>
-                    <form id="goalForm" class="space-y-3">
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">ID do Membro</label>
-                            <input type="text" id="goalPassportInput" required placeholder="Ex: 12" class="w-full bg-darkbg border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500 font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Quantidade da Meta (Total 3 Itens)</label>
-                            <input type="number" id="goalTargetValue" min="1" required placeholder="Ex: 1500" class="w-full bg-darkbg border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500 font-bold">
-                        </div>
-                        <div class="flex gap-2 pt-1">
-                            <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 px-3 rounded-lg text-xs transition cursor-pointer uppercase">
-                                Salvar Meta
-                            </button>
-                            <button type="button" onclick="resetAllGoalsAndLogs()" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-2 px-3 rounded-lg text-xs transition flex items-center gap-1.5 cursor-pointer">
-                                <i class="fa-solid fa-rotate-right"></i> Resetar Semana
-                            </button>
-                        </div>
-                    </form>
+        <section id="managerPanel" class="bg-[#111827] neon-border p-6 rounded-2xl shadow-xl hidden space-y-4">
+            <h2 class="text-base font-black text-amber-400 uppercase tracking-wide border-b border-slate-800 pb-2">
+                <i class="fa-solid fa-user-shield"></i> Painel de Controle do Gerente
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-[#060910] p-4 rounded-xl border border-slate-800 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase">Definir Meta Semanal por ID</h3>
+                    <input type="text" id="goalPassportInput" placeholder="ID do Membro (Ex: 12)" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+                    <input type="number" id="goalTargetValue" placeholder="Quantidade Meta (Ex: 1500)" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+                    <div class="flex gap-2">
+                        <button onclick="salvarMeta()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2 rounded-lg text-xs uppercase cursor-pointer">Salvar Meta</button>
+                        <button onclick="resetarSemana()" class="bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-2 px-3 rounded-lg text-xs cursor-pointer">Resetar Semana</button>
+                    </div>
                 </div>
-
-                <!-- IDs Ativos -->
-                <div class="space-y-3 bg-[#060910]/50 p-4 rounded-xl border border-slate-800 flex flex-col">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">IDs Ativos no Histórico</h3>
-                    <div class="bg-darkbg border border-slate-800 rounded-lg p-3 flex-1 max-h-[140px] overflow-y-auto divide-y divide-slate-900" id="activeIdsList"></div>
+                <div class="bg-[#060910] p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase">IDs Ativos</h3>
+                    <div id="activeIdsList" class="text-xs text-slate-400 space-y-1 max-h-[100px] overflow-y-auto"></div>
                 </div>
             </div>
         </section>
 
-        <!-- DASHBOARD DE ESTOQUE -->
+        <!-- ESTOQUE -->
         <section>
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-base font-bold flex items-center gap-2 text-slate-200 uppercase tracking-wide">
-                    <i class="fa-solid fa-warehouse text-cyan-400"></i> Estoque Atual no Baú
-                </h2>
-                <span class="text-[11px] text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1 rounded-full font-bold uppercase">Soma Automática</span>
-            </div>
+            <h2 class="text-base font-bold text-slate-200 uppercase tracking-wide mb-3">
+                <i class="fa-solid fa-warehouse text-cyan-400"></i> Estoque Atual no Baú
+            </h2>
             <div id="stockCards" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
         </section>
 
         <!-- FORMULÁRIO E METAS -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- REGISTRAR FARM -->
-            <section class="lg:col-span-1 bg-cardbg neon-border p-6 rounded-2xl shadow-xl space-y-4">
-                <h2 class="text-base font-bold flex items-center gap-2 text-cyan-400 uppercase tracking-wide pb-2 border-b border-slate-800">
+            <section class="lg:col-span-1 bg-[#111827] neon-border p-6 rounded-2xl shadow-xl space-y-4">
+                <h2 class="text-base font-bold text-cyan-400 uppercase tracking-wide border-b border-slate-800 pb-2">
                     <i class="fa-solid fa-circle-plus"></i> Registrar Movimentação
                 </h2>
                 
-                <form id="farmForm" class="space-y-3.5">
+                <div class="space-y-3">
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Seu ID (Passaporte)</label>
-                        <input type="text" id="memberName" readonly class="w-full bg-darkbg border border-slate-800 rounded-xl px-3 py-2 text-sm text-cyan-400 font-black tracking-wider cursor-not-allowed">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Seu ID</label>
+                        <input type="text" id="memberName" readonly class="w-full bg-[#060910] border border-slate-800 rounded-xl px-3 py-2 text-sm text-cyan-400 font-black">
                     </div>
-
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Item Farmado</label>
-                        <select id="itemSelect" required class="w-full bg-darkbg border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 font-bold">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Item</label>
+                        <select id="itemSelect" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
                             <option value="Flor de Cannabis">Flor de Cannabis</option>
                             <option value="Thinner">Thinner</option>
                             <option value="Quetamina">Quetamina</option>
                         </select>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Operação</label>
-                            <select id="actionType" class="w-full bg-darkbg border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 font-bold">
+                            <select id="actionType" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
                                 <option value="entrada">Entrada (+)</option>
                                 <option value="saida">Saída (-)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Quantidade</label>
-                            <input type="number" id="itemQuantity" min="1" required placeholder="Ex: 100" class="w-full bg-darkbg border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 font-bold">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Qtd</label>
+                            <input type="number" id="itemQuantity" min="1" placeholder="Ex: 100" class="w-full bg-[#060910] border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
                         </div>
                     </div>
-
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Print / Foto do Baú <span class="text-red-400">*Obrigatório</span></label>
-                        <input type="file" id="bauPhoto" accept="image/*" required class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-cyan-500/10 file:text-cyan-400 hover:file:bg-cyan-500/20 cursor-pointer border border-slate-800 rounded-xl bg-darkbg">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Print do Baú (Obrigatório)</label>
+                        <input type="file" id="bauPhoto" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-cyan-500/10 file:text-cyan-400 cursor-pointer bg-[#060910] border border-slate-800 rounded-xl">
                     </div>
-
-                    <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black py-3 px-4 rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-900/40 flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-check"></i> Salvar Registro
+                    <button onclick="salvarFarm()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider cursor-pointer shadow-lg">
+                        Salvar Registro
                     </button>
-                </form>
+                </div>
             </section>
 
-            <!-- ACOMPANHAMENTO DE METAS -->
-            <section class="lg:col-span-2 bg-cardbg neon-border p-6 rounded-2xl shadow-xl flex flex-col">
-                <h2 class="text-base font-bold mb-4 flex items-center gap-2 text-slate-200 uppercase tracking-wide pb-2 border-b border-slate-800">
+            <section class="lg:col-span-2 bg-[#111827] neon-border p-6 rounded-2xl shadow-xl flex flex-col">
+                <h2 class="text-base font-bold text-slate-200 uppercase tracking-wide border-b border-slate-800 pb-2 mb-4">
                     <i class="fa-solid fa-bullseye text-cyan-400"></i> Progresso das Metas Semanais
                 </h2>
-                <div class="space-y-3 flex-1 overflow-y-auto max-h-[340px] pr-1" id="goalsListContainer"></div>
+                <div class="space-y-3 flex-1 overflow-y-auto max-h-[320px]" id="goalsListContainer"></div>
             </section>
-
         </div>
 
-        <!-- HISTÓRICO DE MOVIMENTAÇÕES -->
-        <section class="bg-cardbg neon-border p-6 rounded-2xl shadow-xl">
-            <h2 class="text-base font-bold mb-4 flex items-center gap-2 text-slate-200 uppercase tracking-wide pb-2 border-b border-slate-800">
+        <!-- HISTÓRICO -->
+        <section class="bg-[#111827] neon-border p-6 rounded-2xl shadow-xl">
+            <h2 class="text-base font-bold text-slate-200 uppercase tracking-wide border-b border-slate-800 pb-2 mb-4">
                 <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> Histórico de Movimentações
             </h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm text-slate-300">
-                    <thead class="bg-[#060910] text-[11px] uppercase tracking-wider text-cyan-400 border-b border-slate-800">
+                    <thead class="bg-[#060910] text-[11px] uppercase text-cyan-400 border-b border-slate-800">
                         <tr>
                             <th class="p-3">Data/Hora</th>
-                            <th class="p-3">ID Operador</th>
+                            <th class="p-3">ID</th>
                             <th class="p-3">Item</th>
                             <th class="p-3">Ação</th>
                             <th class="p-3">Qtd</th>
-                            <th class="p-3">Foto do Baú</th>
+                            <th class="p-3">Foto</th>
                         </tr>
                     </thead>
-                    <tbody id="logsTableBody" class="divide-y divide-slate-800/60"></tbody>
+                    <tbody id="logsTableBody" class="divide-y divide-slate-800"></tbody>
                 </table>
             </div>
         </section>
-
     </main>
 
-    <!-- MODAL DE VISUALIZAÇÃO DE FOTO -->
-    <div id="photoModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="relative max-w-3xl w-full bg-cardbg neon-border rounded-2xl p-3 shadow-2xl">
-            <button onclick="closePhotoModal()" class="absolute -top-3 -right-3 bg-red-600 text-white w-9 h-9 rounded-full font-bold shadow-lg flex items-center justify-center hover:bg-red-500 cursor-pointer transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <img id="modalImage" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-xl">
+    <!-- MODAL FOTO -->
+    <div id="photoModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
+        <div class="relative max-w-2xl w-full bg-[#111827] p-2 rounded-2xl">
+            <button onclick="closePhotoModal()" class="absolute -top-3 -right-3 bg-red-600 text-white w-8 h-8 rounded-full font-bold cursor-pointer">X</button>
+            <img id="modalImage" src="" class="w-full max-h-[80vh] object-contain rounded-xl">
         </div>
     </div>
 
-    <!-- SCRIPT DE CONTROLE BLINDADO -->
+    <!-- SCRIPT SIMPLIFICADO E SEGURO -->
     <script>
         const MASTER_PASSWORD = "488457@";
-        let currentUser = null;
-
-        try {
-            currentUser = JSON.parse(localStorage.getItem('givos_user')) || null;
-        } catch(e) {
-            currentUser = null;
-        }
-
-        const loginScreen = document.getElementById('loginScreen');
-        const loginForm = document.getElementById('loginForm');
-        const userSessionBadge = document.getElementById('userSessionBadge');
-        const managerIndicator = document.getElementById('managerIndicator');
-        const managerPanel = document.getElementById('managerPanel');
-        const memberNameInput = document.getElementById('memberName');
-
+        let currentUser = JSON.parse(localStorage.getItem('givos_user')) || null;
         let inventory = JSON.parse(localStorage.getItem('givos_stock')) || { "Flor de Cannabis": 0, "Thinner": 0, "Quetamina": 0 };
         let logs = JSON.parse(localStorage.getItem('givos_logs')) || [];
         let goals = JSON.parse(localStorage.getItem('givos_goals')) || {};
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.onload = function() {
             if (currentUser && currentUser.id) {
-                initApp();
-            } else {
-                loginScreen.classList.remove('hidden');
+                document.getElementById('loginScreen').style.display = 'none';
+                iniciarSistema();
             }
-        });
+        };
 
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const inputEl = document.getElementById('loginPassport');
-            if(!inputEl) return;
-            const inputVal = inputEl.value.trim();
-
-            if (inputVal === MASTER_PASSWORD) {
-                currentUser = { name: "Gerente (Admin)", id: "MASTER", isManager: true };
-            } else if (inputVal !== "") {
-                currentUser = { name: `ID [${inputVal}]`, id: inputVal, isManager: false };
-            } else {
-                alert("Digite um ID válido.");
+        function fazerLogin() {
+            const val = document.getElementById('loginPassport').value.trim();
+            if (!val) {
+                alert("Digite um ID ou a senha master.");
                 return;
             }
 
-            try {
-                localStorage.setItem('givos_user', JSON.stringify(currentUser));
-            } catch(err) {
-                console.error(err);
+            if (val === MASTER_PASSWORD) {
+                currentUser = { name: "Gerente (Admin)", id: "MASTER", isManager: true };
+            } else {
+                currentUser = { name: `ID [${val}]`, id: val, isManager: false };
             }
-            
-            initApp();
-        });
+
+            localStorage.setItem('givos_user', JSON.stringify(currentUser));
+            document.getElementById('loginScreen').style.display = 'none';
+            iniciarSistema();
+        }
 
         function logout() {
             localStorage.removeItem('givos_user');
             location.reload();
         }
 
-        function hardResetSystem() {
-            if(confirm("Deseja limpar os dados do navegador e reiniciar o sistema?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function initApp() {
-            if(loginScreen) {
-                loginScreen.classList.add('hidden');
-                loginScreen.style.display = 'none';
-            }
-            if(userSessionBadge) userSessionBadge.textContent = currentUser.name;
-            if(memberNameInput) memberNameInput.value = currentUser.name;
+        function iniciarSistema() {
+            document.getElementById('userSessionBadge').textContent = currentUser.name;
+            document.getElementById('memberName').value = currentUser.name;
 
             if (currentUser.isManager) {
-                if(managerIndicator) {
-                    managerIndicator.classList.remove('hidden');
-                    managerIndicator.classList.add('flex');
-                }
-                if(managerPanel) {
-                    managerPanel.classList.remove('hidden');
-                }
+                document.getElementById('managerIndicator').style.display = 'flex';
+                document.getElementById('managerPanel').style.display = 'block';
                 renderActiveIds();
             }
 
@@ -328,7 +232,165 @@
             renderGoals();
         }
 
+        function salvarFarm() {
+            const item = document.getElementById('itemSelect').value;
+            const type = document.getElementById('actionType').value;
+            const qty = parseInt(document.getElementById('itemQuantity').value);
+            const photoInput = document.getElementById('bauPhoto');
+
+            if (!qty || qty <= 0) {
+                alert("Digite uma quantidade válida.");
+                return;
+            }
+
+            if (!photoInput.files || !photoInput.files[0]) {
+                alert("A foto do baú é obrigatória!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoUrl = e.target.result;
+
+                if (type === 'entrada') {
+                    inventory[item] = (inventory[item] || 0) + qty;
+                } else {
+                    inventory[item] = Math.max(0, (inventory[item] || 0) - qty);
+                }
+
+                logs.unshift({
+                    date: new Date().toLocaleString('pt-BR'),
+                    member: currentUser.name,
+                    item, type, qty,
+                    photo: photoUrl
+                });
+
+                salvarEDados();
+                document.getElementById('itemQuantity').value = '';
+                photoInput.value = '';
+                alert("Movimentação registrada com sucesso!");
+            };
+            reader.readAsDataURL(photoInput.files[0]);
+        }
+
+        function salvarMeta() {
+            const targetId = document.getElementById('goalPassportInput').value.trim();
+            const targetVal = parseInt(document.getElementById('goalTargetValue').value);
+
+            if (!targetId || !targetVal) {
+                alert("Preencha o ID e o valor da meta.");
+                return;
+            }
+
+            goals[`ID [${targetId}]`] = targetVal;
+            localStorage.setItem('givos_goals', JSON.stringify(goals));
+            renderGoals();
+            document.getElementById('goalPassportInput').value = '';
+            document.getElementById('goalTargetValue').value = '';
+            alert("Meta salva com sucesso!");
+        }
+
+        function resetarSemana() {
+            if (confirm("Tem certeza que deseja resetar a semana?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function salvarEDados() {
+            localStorage.setItem('givos_stock', JSON.stringify(inventory));
+            localStorage.setItem('givos_logs', JSON.stringify(logs));
+            localStorage.setItem('givos_goals', JSON.stringify(goals));
+            renderStock();
+            renderLogs();
+            renderGoals();
+            if (currentUser.isManager) renderActiveIds();
+        }
+
+        function renderStock() {
+            const c = document.getElementById('stockCards');
+            c.innerHTML = '';
+            for (let [item, qty] of Object.entries(inventory)) {
+                c.innerHTML += `
+                    <div class="bg-[#111827] neon-border p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] text-cyan-400 uppercase font-black">Item</p>
+                            <h3 class="text-sm font-extrabold text-white">${item}</h3>
+                        </div>
+                        <span class="text-2xl font-black text-cyan-300">${qty}</span>
+                    </div>
+                `;
+            }
+        }
+
+        function renderLogs() {
+            const tbody = document.getElementById('logsTableBody');
+            tbody.innerHTML = '';
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500 text-xs">Nenhum registro.</td></tr>`;
+                return;
+            }
+            logs.forEach(l => {
+                const color = l.type === 'entrada' ? 'text-emerald-400' : 'text-red-400';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/40">
+                        <td class="p-3 text-xs text-slate-400">${l.date}</td>
+                        <td class="p-3 font-bold text-white">${l.member}</td>
+                        <td class="p-3">${l.item}</td>
+                        <td class="p-3 font-black uppercase ${color}">${l.type}</td>
+                        <td class="p-3 font-black text-cyan-300">${l.qty}</td>
+                        <td class="p-3"><img src="${l.photo}" onclick="openPhotoModal('${l.photo}')" class="w-10 h-10 object-cover rounded-lg cursor-pointer border border-cyan-500/30"></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderGoals() {
+            const container = document.getElementById('goalsListContainer');
+            container.innerHTML = '';
+            let totals = {};
+            logs.forEach(l => { if (l.type === 'entrada') totals[l.member] = (totals[l.member] || 0) + l.qty; });
+
+            if (Object.keys(goals).length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">Nenhuma meta definida.</p>`;
+                return;
+            }
+
+            for (let [member, target] of Object.entries(goals)) {
+                let current = totals[member] || 0;
+                let percent = Math.min(100, Math.round((current / target) * 100));
+                container.innerHTML += `
+                    <div class="bg-[#060910] p-3 rounded-xl border border-slate-800 space-y-1.5">
+                        <div class="flex justify-between text-xs font-bold text-white">
+                            <span>${member}</span>
+                            <span>${current} / ${target} (${percent}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-cyan-500 h-full rounded-full" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
         function renderActiveIds() {
             const container = document.getElementById('activeIdsList');
-            if(!container) return;
             container.innerHTML = '';
+            let ids = [...new Set(logs.map(l => l.member))];
+            if (ids.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500">Nenhum ID registrado.</p>`;
+                return;
+            }
+            ids.forEach(id => { container.innerHTML += `<div>• ${id}</div>`; });
+        }
+
+        function openPhotoModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('photoModal').style.display = 'flex';
+        }
+        function closePhotoModal() {
+            document.getElementById('photoModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
