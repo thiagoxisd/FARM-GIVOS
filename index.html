@@ -42,6 +42,184 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
+    <!-- ============================================================
+         TEMA CLARO NEON AZUL (aplicado sobre as classes existentes)
+         ============================================================ -->
+    <style>
+        :root {
+            --ink: #08293c;
+            --ink-2: #33566a;
+            --ink-3: #6b8a9c;
+            --ink-4: #93aebb;
+            --line: #d8eefb;
+            --line-2: #b9e2f7;
+            --surface: #ffffff;
+            --surface-2: #f4fbff;
+            --neon: #38c8f5;
+            --neon-2: #0ea5e9;
+            --neon-3: #0284c7;
+            --glow: 0 0 0 1px rgba(56, 200, 245, .32), 0 12px 30px -14px rgba(14, 165, 233, .55);
+        }
+
+        html { color-scheme: light; }
+
+        body {
+            background-color: #f4fbff !important;
+            background-image:
+                radial-gradient(950px 520px at 8% -12%, #d7f3ff 0%, rgba(215, 243, 255, 0) 62%),
+                radial-gradient(820px 480px at 102% 4%, #e9f9ff 0%, rgba(233, 249, 255, 0) 60%),
+                radial-gradient(700px 700px at 50% 120%, #e6f7ff 0%, rgba(230, 247, 255, 0) 65%);
+            background-attachment: fixed;
+            color: var(--ink);
+        }
+
+        ::-webkit-scrollbar-track { background: #eef9ff; }
+        ::-webkit-scrollbar-thumb { background: #c7e8f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #9fd8f2; }
+
+        /* ---------- superfícies ---------- */
+        .bg-brand-cardBg { background-color: #ffffff !important; }
+        header.bg-brand-cardBg {
+            background-color: rgba(255, 255, 255, .88) !important;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 14px 34px -28px rgba(2, 132, 199, .8) !important;
+        }
+        .bg-slate-900 { background-color: var(--surface-2) !important; }
+        .bg-slate-900\/50 { background-color: rgba(244, 251, 255, .75) !important; }
+        .bg-slate-900\/60 { background-color: transparent !important; }
+        .bg-slate-800 { background-color: #eaf7ff !important; }
+        .bg-brand-darkBg { background-color: #f4fbff !important; }
+        .bg-\[\#080b12\] { background-color: transparent !important; }
+        .bg-black\/80 { background-color: rgba(8, 41, 60, .38) !important; }
+        .bg-black\/90 { background-color: rgba(8, 41, 60, .55) !important; }
+
+        /* ---------- bordas ---------- */
+        .border-brand-border { border-color: var(--line) !important; }
+        .border-slate-700 { border-color: var(--line-2) !important; }
+        .border-slate-800 { border-color: var(--line) !important; }
+        .divide-slate-800 > :not([hidden]) ~ :not([hidden]) { border-color: var(--line) !important; }
+        .divide-slate-800\/80 > :not([hidden]) ~ :not([hidden]) { border-color: var(--line) !important; }
+
+        /* ---------- textos ---------- */
+        .text-white { color: var(--ink) !important; }
+        .text-slate-200 { color: #123a50 !important; }
+        .text-slate-300 { color: var(--ink-2) !important; }
+        .text-slate-400 { color: var(--ink-3) !important; }
+        .text-slate-500 { color: #6f8fa0 !important; }
+        .text-slate-600 { color: var(--ink-4) !important; }
+
+        /* texto branco somente onde o fundo é colorido */
+        .bg-emerald-600, .bg-emerald-600 *,
+        .bg-purple-600, .bg-purple-600 *,
+        .bg-amber-700, .bg-amber-700 *,
+        .bg-red-600, .bg-red-600 *,
+        .peer:checked ~ .peer-checked\:text-white { color: #ffffff !important; }
+
+        /* ---------- acento principal (azul bebê neon) ---------- */
+        .text-emerald-400 { color: var(--neon-3) !important; }
+        .text-emerald-300 { color: var(--neon-2) !important; }
+        .text-emerald-400\/80 { color: rgba(2, 132, 199, .85) !important; }
+        .bg-emerald-500\/10 { background-color: rgba(56, 200, 245, .15) !important; }
+        .border-emerald-500\/30 { border-color: #b7e7fb !important; }
+        .bg-emerald-950\/40 { background-color: #e8f8ff !important; }
+        .bg-emerald-950\/50 { background-color: #e8f8ff !important; }
+        .bg-emerald-950\/60 { background-color: #e8f8ff !important; }
+        .border-emerald-800\/50 { border-color: #bae9ff !important; }
+        .border-emerald-800\/60 { border-color: #bae9ff !important; }
+        .border-emerald-900\/60 { border-color: #a9e2f8 !important; }
+        .border-emerald-800 { border-color: #a5e3fb !important; }
+
+        .bg-emerald-600 {
+            background-image: linear-gradient(135deg, #54d4f8 0%, #0ea5e9 100%) !important;
+            background-color: #0ea5e9 !important;
+            border-color: transparent !important;
+            box-shadow: var(--glow);
+        }
+        .hover\:bg-emerald-500:hover {
+            background-image: linear-gradient(135deg, #74ddfb 0%, #22b8ef 100%) !important;
+            background-color: #22b8ef !important;
+        }
+
+        /* botões de operação (peer-checked) */
+        .peer:checked ~ .peer-checked\:bg-emerald-600 {
+            background-image: linear-gradient(135deg, #54d4f8 0%, #0ea5e9 100%) !important;
+            border-color: #7fe0ff !important;
+            box-shadow: var(--glow);
+        }
+        .peer:checked ~ .peer-checked\:border-emerald-500 { border-color: #7fe0ff !important; }
+        .peer:checked ~ .peer-checked\:bg-red-600 {
+            background-color: #f43f5e !important;
+            border-color: #fb7185 !important;
+            box-shadow: 0 0 0 1px rgba(244, 63, 94, .3), 0 10px 24px -14px rgba(225, 29, 72, .55);
+        }
+        .peer:checked ~ .peer-checked\:border-red-500 { border-color: #fb7185 !important; }
+
+        /* ---------- gerência (azul profundo) ---------- */
+        .text-purple-400 { color: #0369a1 !important; }
+        .text-purple-300 { color: #0e7490 !important; }
+        .bg-purple-500\/20 { background-color: rgba(56, 200, 245, .16) !important; }
+        .border-purple-500\/30 { border-color: #b7e7fb !important; }
+        .bg-purple-500\/5 { background-color: rgba(56, 200, 245, .10) !important; }
+        .bg-purple-600 {
+            background-image: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%) !important;
+            box-shadow: var(--glow);
+        }
+        .hover\:bg-purple-500:hover {
+            background-image: linear-gradient(135deg, #22b8ef 0%, #0284c7 100%) !important;
+        }
+
+        /* ---------- vermelho / alerta ---------- */
+        .text-red-400 { color: #e11d48 !important; }
+        .text-red-300 { color: #be123c !important; }
+        .bg-red-950\/40 { background-color: #fff1f3 !important; }
+        .bg-red-950\/60 { background-color: #fff1f3 !important; }
+        .border-red-800\/50 { border-color: #fecdd3 !important; }
+        .border-red-800 { border-color: #fecdd3 !important; }
+        .bg-red-600 { background-color: #f43f5e !important; }
+        .hover\:bg-red-500:hover { background-color: #fb7185 !important; }
+        .hover\:bg-red-900\/60:hover { background-color: #ffe4e6 !important; }
+        .bg-amber-700 { background-image: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important; }
+        .hover\:bg-amber-600:hover { background-image: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%) !important; }
+
+        /* ---------- hovers ---------- */
+        .hover\:bg-slate-700:hover { background-color: #dff3ff !important; }
+        .hover\:bg-slate-900:hover { background-color: #f2fbff !important; }
+        .hover\:bg-slate-900\/60:hover { background-color: #f5fcff !important; }
+        .hover\:text-white:hover { color: var(--ink) !important; }
+        .hover\:text-emerald-400:hover, .hover\:text-emerald-300:hover { color: var(--neon-3) !important; }
+        .hover\:text-red-400:hover { color: #e11d48 !important; }
+        .hover\:border-emerald-500\/40:hover { border-color: #8adcf8 !important; }
+        .hover\:border-emerald-500\/50:hover { border-color: #8adcf8 !important; }
+
+        /* ---------- foco ---------- */
+        .focus\:border-emerald-500:focus {
+            border-color: var(--neon) !important;
+            box-shadow: 0 0 0 3px rgba(56, 200, 245, .22) !important;
+        }
+        input, select, textarea { color: var(--ink) !important; }
+        input::placeholder, textarea::placeholder { color: #9cb8c7 !important; }
+        select option { background-color: #ffffff; color: var(--ink); }
+
+        /* ---------- sombras ---------- */
+        .shadow-2xl { box-shadow: 0 26px 60px -42px rgba(3, 105, 161, .65) !important; }
+        .shadow-xl { box-shadow: 0 18px 44px -30px rgba(3, 105, 161, .6) !important; }
+        .shadow-lg { box-shadow: 0 14px 32px -22px rgba(3, 105, 161, .6) !important; }
+        .shadow-emerald-950\/50 { box-shadow: 0 12px 28px -14px rgba(14, 165, 233, .55) !important; }
+
+        /* ---------- tela de login ---------- */
+        #entryGate > div {
+            box-shadow:
+                0 40px 90px -46px rgba(2, 132, 199, .5),
+                0 0 0 1px rgba(56, 200, 245, .22),
+                0 0 60px -18px rgba(56, 200, 245, .35) !important;
+        }
+        .neon-logo { filter: drop-shadow(0 0 16px rgba(56, 200, 245, .55)); }
+
+        /* ---------- detalhes neon ---------- */
+        .neon-ring {
+            box-shadow: 0 0 0 1px rgba(56, 200, 245, .35), 0 0 26px -6px rgba(56, 200, 245, .55);
+        }
+    </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
 
@@ -49,8 +227,8 @@
     <header class="bg-brand-cardBg border-b border-brand-border sticky top-0 z-30 shadow-2xl">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/30">
-                    <i data-lucide="shield-check" class="w-6 h-6 text-emerald-400"></i>
+                <div class="bg-emerald-500/10 p-1.5 rounded-xl border border-emerald-500/30">
+                    <img src="logo.webp" alt="Logo da facção" class="w-9 h-9 object-contain neon-logo">
                 </div>
                 <div>
                     <h1 class="text-base font-extrabold text-white tracking-wider uppercase flex items-center gap-2">
@@ -121,16 +299,29 @@
                     </div>
                     <button onclick="saveGlobalGoal()" class="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg">Salvar meta geral</button>
                     <button onclick="resetWeeklyGoals()" class="px-3 py-2 bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold rounded-lg">Resetar semana</button>
+                    <button onclick="managerAction(openMembersModal)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                        <i data-lucide="users" class="w-4 h-4"></i> Gerenciar membros
+                    </button>
                 </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5" id="managerSummary"></div>
-            <div class="flex items-center justify-between gap-3 mb-3">
-                <h3 class="text-sm font-bold text-slate-200">Desempenho por membro e item</h3>
-                <span class="text-[10px] text-slate-500">Percentual calculado sobre a meta geral</span>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-200">Desempenho por membro e item</h3>
+                    <span id="reportHint" class="text-[10px] text-slate-500">Selecione um membro para ver somente o desempenho dele.</span>
+                </div>
+                <div class="relative w-full sm:w-72">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                        <i data-lucide="user-round-search" class="w-4 h-4"></i>
+                    </span>
+                    <select id="reportMemberFilter" onchange="changeReportMember(this.value)" class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
+                        <option value="ALL">Todos (visão geral)</option>
+                    </select>
+                </div>
             </div>
             <div class="overflow-x-auto rounded-lg border border-slate-800">
                 <table class="w-full min-w-[720px] text-left text-xs">
-                    <thead class="bg-slate-900 text-slate-400">
+                    <thead id="reportTableHead" class="bg-slate-900 text-slate-400">
                         <tr>
                             <th class="px-3 py-3">Membro / Passaporte</th>
                             <th class="px-3 py-3">Item</th>
@@ -326,6 +517,27 @@
         </div>
     </div>
 
+    <!-- MODAL: GERENCIAR MEMBROS -->
+    <div id="membersModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-brand-cardBg border border-brand-border rounded-xl max-w-lg w-full p-5 shadow-2xl">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
+                    Membros cadastrados
+                </h3>
+                <button onclick="closeMembersModal()" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-3">Excluir remove o cadastro do painel. O histórico de farm e as fotos continuam salvos.</p>
+            <p id="membersCount" class="text-[11px] text-emerald-400 mt-1"></p>
+            <div class="max-h-72 overflow-y-auto space-y-2 pr-1 mt-3" id="membersList"></div>
+            <div class="pt-3 mt-3 border-t border-slate-800 text-right">
+                <button onclick="closeMembersModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg font-medium">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL 3: VISUALIZADOR DA FOTO -->
     <div id="imageModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center hidden p-4" onclick="closeImageModal()">
         <div class="relative max-w-4xl w-full flex flex-col items-center">
@@ -339,8 +551,9 @@
     <!-- TELA INICIAL DE ACESSO: PASSAPORTE OU SENHA MASTER -->
     <div id="entryGate" class="fixed inset-0 bg-[#080b12] z-[100] flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-brand-cardBg border border-brand-border rounded-2xl p-7 shadow-2xl">
-            <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-                <i data-lucide="shield-check" class="w-7 h-7 text-emerald-400"></i>
+            <div class="relative w-32 h-32 mx-auto mb-3 flex items-center justify-center">
+                <div class="absolute inset-2 rounded-full bg-sky-300/40 blur-2xl"></div>
+                <img src="logo.webp" alt="Logo da facção" class="relative w-32 h-32 object-contain neon-logo">
             </div>
             <h2 class="text-xl font-extrabold text-white text-center">Painel de Farm</h2>
             <p class="text-xs text-slate-400 text-center mt-2 mb-6">Digite seu passaporte numérico para acessar e registrar seu farm.</p>
@@ -810,64 +1023,148 @@
             lucide.createIcons();
         }
 
-        function renderGoals() {
-            const body = document.getElementById('managerReportBody');
-            const empty = document.getElementById('managerReportEmpty');
-            const summary = document.getElementById('managerSummary');
-            if (!body || !empty || !summary) return;
+        let reportMember = '';
 
-            body.innerHTML = '';
-            summary.innerHTML = '';
-
-            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
-
-            const goal = Number(settings.global_goal) || 0;
-            const totalRows = members.length * catalog.length;
-
-            if (!members.length || !catalog.length || goal <= 0) {
-                empty.classList.remove('hidden');
-                empty.textContent = !members.length
-                    ? 'Nenhum membro cadastrado ainda.'
-                    : (!catalog.length ? 'Cadastre itens no catálogo.' : 'Defina a meta semanal geral para gerar o relatório.');
-                return;
-            }
-            empty.classList.add('hidden');
-
-            let completed = 0;
-            let sumPercent = 0;
-            const rows = [];
-
-            members.forEach(member => {
-                catalog.forEach(item => {
-                    const amount = getMemberProgress(member.passport, item, member.name);
-                    const rawPercent = (amount / goal) * 100;
-                    const percent = Math.round(rawPercent);
-                    const done = amount >= goal;
-                    if (done) completed++;
-                    sumPercent += Math.min(100, rawPercent);
-                    rows.push({ member, item, amount, percent, done });
-                });
+        // Soma todo o histórico uma única vez (rápido mesmo com muitos registros).
+        function buildProgressMap() {
+            const resetAt = goalResetTimestamp();
+            const map = new Map();
+            logs.forEach(log => {
+                const time = new Date(log.created_at).getTime() || 0;
+                if (time <= resetAt || !log.item) return;
+                const key = (log.passport
+                    ? 'p:' + String(log.passport)
+                    : 'n:' + String(log.member || '').trim().toLowerCase()) + '\u0001' + log.item;
+                const delta = log.operation === 'ENTRY' ? (Number(log.quantity) || 0) : -(Number(log.quantity) || 0);
+                map.set(key, (map.get(key) || 0) + delta);
             });
+            return map;
+        }
 
-            const average = totalRows ? Math.round(sumPercent / totalRows) : 0;
-            const cards = [
-                { label: 'Membros cadastrados', value: members.length.toLocaleString('pt-BR'), icon: 'users' },
-                { label: 'Metas concluídas', value: `${completed} / ${totalRows}`, icon: 'trophy' },
-                { label: 'Progresso médio', value: `${average}%`, icon: 'chart-no-axes-column-increasing' }
-            ];
+        function progressFor(map, member, item) {
+            const byPassport = map.get('p:' + String(member.passport) + '\u0001' + item) || 0;
+            const byName = map.get('n:' + String(member.name || '').trim().toLowerCase() + '\u0001' + item) || 0;
+            return Math.max(0, byPassport || byName);
+        }
+
+        function changeReportMember(value) {
+            reportMember = value;
+            renderGoals();
+        }
+
+        function renderSummaryCards(summary, cards) {
             cards.forEach(card => {
                 const el = document.createElement('div');
                 el.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4';
                 el.innerHTML = `<div class="flex items-center justify-between text-slate-400 text-[11px]"><span>${card.label}</span><i data-lucide="${card.icon}" class="w-4 h-4 text-purple-400"></i></div><div class="text-2xl font-extrabold text-white mt-2">${card.value}</div>`;
                 summary.appendChild(el);
             });
+        }
 
-            rows.sort((a, b) => a.member.name.localeCompare(b.member.name, 'pt-BR') || a.item.localeCompare(b.item, 'pt-BR'));
+        function renderGoals() {
+            const body = document.getElementById('managerReportBody');
+            const empty = document.getElementById('managerReportEmpty');
+            const summary = document.getElementById('managerSummary');
+            const head = document.getElementById('reportTableHead');
+            const filter = document.getElementById('reportMemberFilter');
+            const hint = document.getElementById('reportHint');
+            if (!body || !empty || !summary || !head) return;
+
+            body.innerHTML = '';
+            summary.innerHTML = '';
+
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+
+            // Atualiza o seletor de membros mantendo a escolha atual.
+            if (filter) {
+                filter.innerHTML = '';
+                const allOption = document.createElement('option');
+                allOption.value = 'ALL';
+                allOption.textContent = 'Todos (visão geral)';
+                filter.appendChild(allOption);
+
+                members.forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = String(member.passport);
+                    option.textContent = `${member.name} • ${member.passport}`;
+                    filter.appendChild(option);
+                });
+
+                if (reportMember !== 'ALL' && !members.some(m => String(m.passport) === String(reportMember))) {
+                    reportMember = members.length ? String(members[0].passport) : 'ALL';
+                }
+                if (!reportMember) {
+                    reportMember = members.length ? String(members[0].passport) : 'ALL';
+                }
+                filter.value = reportMember;
+            }
+
+            const goal = Number(settings.global_goal) || 0;
+
+            if (!members.length || !catalog.length || goal <= 0) {
+                empty.classList.remove('hidden');
+                empty.textContent = !members.length
+                    ? 'Nenhum membro cadastrado ainda.'
+                    : (!catalog.length ? 'Cadastre itens no catálogo.' : 'Defina a meta semanal geral para gerar o relatório.');
+                head.innerHTML = '';
+                if (hint) hint.textContent = 'Selecione um membro para ver somente o desempenho dele.';
+                return;
+            }
+            empty.classList.add('hidden');
+
+            const map = buildProgressMap();
+
+            if (reportMember === 'ALL') {
+                renderGeneralReport(map, goal, body, head, summary, hint);
+            } else {
+                renderMemberReport(map, goal, body, head, summary, hint);
+            }
+
+            lucide.createIcons();
+        }
+
+        // Relatório de UM membro: uma linha por item.
+        function renderMemberReport(map, goal, body, head, summary, hint) {
+            const member = members.find(item => String(item.passport) === String(reportMember));
+            if (!member) return;
+
+            head.innerHTML = `
+                <tr>
+                    <th class="px-3 py-3">Membro / Passaporte</th>
+                    <th class="px-3 py-3">Item</th>
+                    <th class="px-3 py-3">Entregue</th>
+                    <th class="px-3 py-3">Meta</th>
+                    <th class="px-3 py-3">Progresso</th>
+                    <th class="px-3 py-3">Status</th>
+                </tr>`;
+            if (hint) hint.textContent = `Mostrando apenas ${member.name} (passaporte ${member.passport}).`;
+
+            let completed = 0;
+            let sumPercent = 0;
+            let totalUnits = 0;
+
+            const rows = catalog.map(item => {
+                const amount = progressFor(map, member, item);
+                const rawPercent = (amount / goal) * 100;
+                const done = amount >= goal;
+                if (done) completed++;
+                sumPercent += Math.min(100, rawPercent);
+                totalUnits += amount;
+                return { item, amount, percent: Math.round(rawPercent), done };
+            });
+
+            const average = catalog.length ? Math.round(sumPercent / catalog.length) : 0;
+            renderSummaryCards(summary, [
+                { label: 'Entregue no total', value: totalUnits.toLocaleString('pt-BR'), icon: 'package' },
+                { label: 'Metas concluídas', value: `${completed} / ${catalog.length}`, icon: 'trophy' },
+                { label: 'Progresso médio', value: `${average}%`, icon: 'chart-no-axes-column-increasing' }
+            ]);
+
             rows.forEach(row => {
                 const tr = document.createElement('tr');
                 const width = Math.min(100, row.percent);
                 tr.innerHTML = `
-                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(row.member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(row.member.passport)}</div></td>
+                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(member.passport)}</div></td>
                     <td class="px-3 py-3">${escapeHtml(row.item)}</td>
                     <td class="px-3 py-3 font-mono text-white">${row.amount.toLocaleString('pt-BR')}</td>
                     <td class="px-3 py-3 font-mono">${goal.toLocaleString('pt-BR')}</td>
@@ -875,7 +1172,68 @@
                     <td class="px-3 py-3">${row.done ? '<span class="text-emerald-400 font-bold">Concluída</span>' : '<span class="text-amber-400">Em andamento</span>'}</td>`;
                 body.appendChild(tr);
             });
-            lucide.createIcons();
+        }
+
+        // Aba geral: uma linha por membro (leve, não trava com muitos membros).
+        function renderGeneralReport(map, goal, body, head, summary, hint) {
+            head.innerHTML = `
+                <tr>
+                    <th class="px-3 py-3">Membro / Passaporte</th>
+                    <th class="px-3 py-3">Metas</th>
+                    <th class="px-3 py-3">Total entregue</th>
+                    <th class="px-3 py-3">Progresso médio</th>
+                    <th class="px-3 py-3">Status geral</th>
+                </tr>`;
+            if (hint) hint.textContent = 'Visão geral: uma linha por membro. Escolha um membro para ver item por item.';
+
+            const totalSlots = members.length * catalog.length;
+            let totalCompleted = 0;
+            let sumAllPercent = 0;
+
+            const rows = members.map(member => {
+                let completed = 0;
+                let sumPercent = 0;
+                let totalUnits = 0;
+
+                catalog.forEach(item => {
+                    const amount = progressFor(map, member, item);
+                    const rawPercent = (amount / goal) * 100;
+                    if (amount >= goal) completed++;
+                    sumPercent += Math.min(100, rawPercent);
+                    totalUnits += amount;
+                });
+
+                totalCompleted += completed;
+                sumAllPercent += sumPercent;
+
+                return {
+                    member,
+                    completed,
+                    totalUnits,
+                    percent: catalog.length ? Math.round(sumPercent / catalog.length) : 0,
+                    allDone: completed === catalog.length
+                };
+            });
+
+            const averageAll = totalSlots ? Math.round(sumAllPercent / totalSlots) : 0;
+            renderSummaryCards(summary, [
+                { label: 'Membros cadastrados', value: members.length.toLocaleString('pt-BR'), icon: 'users' },
+                { label: 'Metas concluídas', value: `${totalCompleted} / ${totalSlots}`, icon: 'trophy' },
+                { label: 'Progresso médio', value: `${averageAll}%`, icon: 'chart-no-axes-column-increasing' }
+            ]);
+
+            rows.sort((a, b) => a.member.name.localeCompare(b.member.name, 'pt-BR'));
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const width = Math.min(100, row.percent);
+                tr.innerHTML = `
+                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(row.member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(row.member.passport)}</div></td>
+                    <td class="px-3 py-3 font-mono">${row.completed} / ${catalog.length}</td>
+                    <td class="px-3 py-3 font-mono text-white">${row.totalUnits.toLocaleString('pt-BR')}</td>
+                    <td class="px-3 py-3 min-w-[170px]"><div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${row.allDone ? 'bg-emerald-500' : 'bg-purple-500'}" style="width:${width}%"></div></div><span class="font-bold ${row.allDone ? 'text-emerald-400' : 'text-slate-300'}">${row.percent}%</span></div></td>
+                    <td class="px-3 py-3">${row.allDone ? '<span class="text-emerald-400 font-bold">Todas concluídas</span>' : `<span class="text-amber-400">${row.completed} de ${catalog.length}</span>`}</td>`;
+                body.appendChild(tr);
+            });
         }
 
         function renderHistory() {
@@ -1025,6 +1383,81 @@
 
         function closeCatalogModal() {
             document.getElementById('catalogModal').classList.add('hidden');
+        }
+
+        // ---------- gerenciar membros ----------
+        function openMembersModal() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            renderMembersList();
+            document.getElementById('membersModal').classList.remove('hidden');
+        }
+
+        function closeMembersModal() {
+            const modal = document.getElementById('membersModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function renderMembersList() {
+            const container = document.getElementById('membersList');
+            const count = document.getElementById('membersCount');
+            if (!container) return;
+
+            container.innerHTML = '';
+            if (count) count.textContent = `${members.length} membro(s) no painel`;
+
+            if (!members.length) {
+                container.innerHTML = '<p class="text-xs text-slate-500 text-center py-3">Nenhum membro cadastrado.</p>';
+                return;
+            }
+
+            [...members]
+                .sort((a, b) => String(a.name).localeCompare(String(b.name), 'pt-BR'))
+                .forEach(member => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center justify-between gap-3 p-2.5 bg-slate-900 border border-slate-800 rounded-lg text-xs';
+                    row.innerHTML = `
+                        <div class="min-w-0">
+                            <div class="font-semibold text-white truncate">${escapeHtml(member.name)}</div>
+                            <div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(member.passport)}</div>
+                        </div>
+                        <button type="button" class="delete-member-btn text-slate-500 hover:text-red-400 p-1 shrink-0" title="Excluir membro">
+                            <i data-lucide="user-x" class="w-4 h-4"></i>
+                        </button>
+                    `;
+                    row.querySelector('.delete-member-btn').addEventListener('click', () => deleteMember(member.passport, member.name));
+                    container.appendChild(row);
+                });
+
+            lucide.createIcons();
+        }
+
+        async function deleteMember(passport, name) {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            if (!confirm(`Excluir o membro "${name}" (passaporte ${passport})?\n\nO histórico de farm dele continua salvo no painel.`)) return;
+
+            try {
+                const { error } = await sb.rpc('farm_delete_member', {
+                    p_password: managerPassword,
+                    p_passport: String(passport)
+                });
+                if (error) throw error;
+
+                members = members.filter(member => String(member.passport) !== String(passport));
+                if (String(reportMember) === String(passport)) reportMember = '';
+
+                renderMembersList();
+                renderGoals();
+                showToast('Membro excluído.');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível excluir. Você já rodou o SQL de atualização?', true);
+            }
         }
 
         function renderCatalogList() {
@@ -1276,6 +1709,7 @@
             if (event.key === 'Escape') {
                 closeImageModal();
                 closeCatalogModal();
+                closeMembersModal();
             }
         });
 
