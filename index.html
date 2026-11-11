@@ -74,6 +74,12 @@
                     <button type="button" id="btnGoToLogin" class="text-slate-400 hover:underline cursor-pointer">Já tenho cadastro (Voltar ao Login)</button>
                 </div>
             </form>
+
+            <div class="border-t border-slate-800 pt-3 text-center">
+                <button type="button" onclick="hardResetSystem()" class="text-[11px] text-red-400 hover:text-red-300 cursor-pointer">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Limpar dados do navegador (Reset Geral)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -120,7 +126,7 @@
                         <div>
                             <label class="block text-xs text-slate-400 mb-1">Selecione o Membro Cadastrado</label>
                             <select id="goalPassportSelect" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
-                                <!-- Preenchido com membros reais cadastrados -->
+                                <!-- Preenchido via JS -->
                             </select>
                         </div>
                         <div>
@@ -142,7 +148,7 @@
                 <div class="space-y-3">
                     <h3 class="text-sm font-semibold text-slate-300">Membros Cadastrados no Sistema</h3>
                     <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3 max-h-[160px] overflow-y-auto divide-y divide-slate-800" id="registeredUsersList">
-                        <!-- Lista de membros cadastrados -->
+                        <!-- Lista de membros -->
                     </div>
                 </div>
             </div>
@@ -252,23 +258,4 @@
             <button onclick="closePhotoModal()" class="absolute -top-3 -right-3 bg-red-600 text-white w-8 h-8 rounded-full font-bold shadow-lg flex items-center justify-center hover:bg-red-500 cursor-pointer">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <img id="modalImage" src="" class="w-full h-auto max-h-[80vh] object-contain rounded-lg">
-        </div>
-    </div>
-
-    <!-- SCRIPT DE CONTROLE -->
-    <script>
-        const MASTER_PASSWORD = "488457@";
-        let currentUser = JSON.parse(localStorage.getItem('givos_user')) || null;
-        let registeredUsers = JSON.parse(localStorage.getItem('givos_registered_users')) || [];
-
-        // ELEMENTOS
-        const loginScreen = document.getElementById('loginScreen');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const userSessionBadge = document.getElementById('userSessionBadge');
-        const managerIndicator = document.getElementById('managerIndicator');
-        const managerPanel = document.getElementById('managerPanel');
-        const memberNameInput = document.getElementById('memberName');
-
-        // DADOS
+            <img id="
