@@ -69,17 +69,15 @@
             </div>
             
             <div class="flex items-center gap-3">
-                <button id="managerAccessBtn" onclick="openManagerLogin()" class="flex items-center gap-1.5 px-3 py-1.5 bg-purple-950/50 hover:bg-purple-900/70 text-xs font-semibold rounded-lg border border-purple-700/60 text-purple-200 transition">
-                    <i data-lucide="lock" class="w-4 h-4"></i>
-                    <span id="managerAccessLabel">Acesso Gerência</span>
+                <span id="sessionBadge" class="text-xs text-emerald-300 font-semibold hidden sm:inline"></span>
+                <button id="exportBtn" onclick="managerAction(exportData)" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition">
+                    <i data-lucide="download" class="w-4 h-4"></i><span class="hidden sm:inline">Exportar CSV</span>
                 </button>
-                <button onclick="managerAction(exportData)" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Exportar CSV</span>
+                <button id="clearHistoryBtn" onclick="managerAction(clearHistory)" class="hidden flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-xs font-semibold rounded-lg border border-red-800/50 text-red-300 transition">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i><span class="hidden sm:inline">Resetar Histórico</span>
                 </button>
-                <button onclick="managerAction(clearHistory)" class="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-xs font-semibold rounded-lg border border-red-800/50 text-red-300 transition">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Resetar Histórico</span>
+                <button id="logoutBtn" onclick="logoutSession()" class="hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 text-slate-200 transition">
+                    Sair
                 </button>
             </div>
         </div>
@@ -95,7 +93,7 @@
                     <i data-lucide="box" class="w-4 h-4 text-emerald-400"></i>
                     Estoque Geral no Baú
                 </h2>
-                <button onclick="managerAction(openCatalogModal)" class="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold bg-emerald-950/40 px-3 py-1.5 rounded-lg border border-emerald-800/50 transition">
+                <button id="catalogManagerBtn" onclick="managerAction(openCatalogModal)" class="hidden text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold bg-emerald-950/40 px-3 py-1.5 rounded-lg border border-emerald-800/50 transition">
                     <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
                     Gerenciar Catálogo
                 </button>
@@ -109,35 +107,44 @@
         <!-- 2. PAINEL DE METAS SEMANAIS DA TROPA (ÁREA DO GERENTE) -->
         <section id="managerGoalsSection" class="hidden bg-brand-cardBg border border-brand-border rounded-xl p-5 shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none"></div>
-
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-brand-border pb-4 mb-4">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-brand-border pb-4 mb-5">
                 <div>
                     <h2 class="text-base font-bold text-white flex items-center gap-2">
-                        <i data-lucide="target" class="w-5 h-5 text-purple-400"></i>
-                        Metas Semanais dos Membros (Gerência)
+                        <i data-lucide="chart-no-axes-combined" class="w-5 h-5 text-purple-400"></i>
+                        Painel exclusivo da gerência
                     </h2>
-                    <p class="text-xs text-slate-400">O progresso é calculado automaticamente com base nas entregas registradas.</p>
+                    <p class="text-xs text-slate-400 mt-1">A mesma meta semanal será aplicada individualmente a cada item do catálogo para todos os membros cadastrados.</p>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                <button onclick="managerAction(resetWeeklyGoals)" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition">
-                    <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
-                    Resetar Meta Semanal
-                </button>
-                <button onclick="managerAction(openGoalModal)" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-purple-900/30 transition">
-                    <i data-lucide="user-plus" class="w-4 h-4"></i>
-                    Definir / Editar Meta
-                </button>
+                <div class="flex flex-wrap items-end gap-2">
+                    <div>
+                        <label for="globalWeeklyGoalInput" class="block text-[11px] text-slate-400 mb-1">Meta semanal por item</label>
+                        <input id="globalWeeklyGoalInput" type="number" min="1" step="1" class="w-40 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white" placeholder="Ex.: 1000">
+                    </div>
+                    <button onclick="saveGlobalGoal()" class="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg">Salvar meta geral</button>
+                    <button onclick="resetWeeklyGoals()" class="px-3 py-2 bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold rounded-lg">Resetar semana</button>
                 </div>
             </div>
-
-            <!-- Lista de Metas dos Membros -->
-            <div id="goalsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Cards de Metas Dinâmicos -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5" id="managerSummary"></div>
+            <div class="flex items-center justify-between gap-3 mb-3">
+                <h3 class="text-sm font-bold text-slate-200">Desempenho por membro e item</h3>
+                <span class="text-[10px] text-slate-500">Percentual calculado sobre a meta geral</span>
             </div>
-            
-            <div id="emptyGoalsMsg" class="hidden text-center py-6 text-slate-500 text-xs">
-                Nenhuma meta cadastrada ainda. Clique em "Definir / Editar Meta" para iniciar a cobrança semanal.
+            <div class="overflow-x-auto rounded-lg border border-slate-800">
+                <table class="w-full min-w-[720px] text-left text-xs">
+                    <thead class="bg-slate-900 text-slate-400">
+                        <tr>
+                            <th class="px-3 py-3">Membro / Passaporte</th>
+                            <th class="px-3 py-3">Item</th>
+                            <th class="px-3 py-3">Entregue</th>
+                            <th class="px-3 py-3">Meta</th>
+                            <th class="px-3 py-3">Progresso</th>
+                            <th class="px-3 py-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="managerReportBody" class="divide-y divide-slate-800 text-slate-300"></tbody>
+                </table>
             </div>
+            <p id="managerReportEmpty" class="hidden text-center text-xs text-slate-500 py-6">Cadastre membros e defina a meta semanal para gerar o relatório.</p>
         </section>
 
         <!-- 3. FORMULÁRIO DE REGISTRO COM FOTO -->
@@ -160,7 +167,7 @@
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                                 <i data-lucide="user" class="w-4 h-4"></i>
                             </span>
-                            <input type="text" id="memberName" required placeholder="Ex: Bolt | #992" class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                            <input type="text" id="memberName" required readonly placeholder="Identificado pelo passaporte" class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
 
@@ -314,49 +321,6 @@
         </div>
     </div>
 
-    <!-- MODAL 2: DEFINIR META DO GERENTE -->
-    <div id="goalModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-brand-cardBg border border-brand-border rounded-xl max-w-md w-full p-5 shadow-2xl">
-            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="target" class="w-4 h-4 text-purple-400"></i>
-                    Definir / Editar Meta Semanal
-                </h3>
-                <button onclick="closeGoalModal()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
-            </div>
-
-            <form onsubmit="handleSaveGoal(event)" class="py-4 space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Membro / Passaporte</label>
-                    <input type="text" id="goalMemberInput" required placeholder="Ex: Bolt | #992" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Item da Meta</label>
-                    <select id="goalItemSelect" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500">
-                        <!-- Preenchido via JS -->
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Quantidade da Meta Semanal</label>
-                    <input type="number" id="goalTargetInput" min="1" required placeholder="Ex: 500" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500">
-                </div>
-
-                <div class="pt-2 flex justify-end gap-2">
-                    <button type="button" onclick="closeGoalModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg font-medium">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg shadow-lg">
-                        Salvar Meta
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- MODAL 3: VISUALIZADOR DA FOTO -->
     <div id="imageModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center hidden p-4" onclick="closeImageModal()">
         <div class="relative max-w-4xl w-full flex flex-col items-center">
@@ -367,22 +331,21 @@
         </div>
     </div>
 
-    <!-- ACESSO À GERÊNCIA -->
-    <div id="managerLoginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] flex items-center justify-center hidden p-4">
-        <div class="bg-brand-cardBg border border-purple-700/60 rounded-xl max-w-sm w-full p-5 shadow-2xl">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2"><i data-lucide="shield-check" class="w-5 h-5 text-purple-400"></i> Acesso da Gerência</h3>
-                <button onclick="closeManagerLogin()" class="text-slate-400 hover:text-white">✕</button>
+    <!-- TELA INICIAL DE ACESSO: PASSAPORTE OU SENHA MASTER -->
+    <div id="entryGate" class="fixed inset-0 bg-[#080b12] z-[100] flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-brand-cardBg border border-brand-border rounded-2xl p-7 shadow-2xl">
+            <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                <i data-lucide="shield-check" class="w-7 h-7 text-emerald-400"></i>
             </div>
-            <form onsubmit="unlockManager(event)" class="space-y-3">
-                <label class="block text-xs text-slate-300">Senha master</label>
-                <input id="managerPasswordInput" type="password" autocomplete="off" required placeholder="Digite a senha master" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-purple-500">
-                <p id="managerLoginError" class="hidden text-xs text-red-400">Senha incorreta. Tente novamente.</p>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeManagerLogin()" class="px-4 py-2 bg-slate-800 text-xs text-slate-300 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-xs text-white font-bold rounded-lg">Entrar</button>
-                </div>
+            <h2 class="text-xl font-extrabold text-white text-center">Painel de Farm</h2>
+            <p class="text-xs text-slate-400 text-center mt-2 mb-6">Digite seu passaporte numérico para acessar e registrar seu farm.</p>
+            <form onsubmit="submitEntry(event)" class="space-y-3">
+                <input id="entryCredential" type="password" inputmode="numeric" autocomplete="off" required placeholder="Passaporte" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-center text-lg tracking-widest text-white focus:outline-none focus:border-emerald-500">
+                <input id="firstRegistrationName" type="text" autocomplete="off" placeholder="Seu nome / apelido (somente no primeiro acesso)" class="hidden w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
+                <p id="entryError" class="hidden text-xs text-red-400 text-center"></p>
+                <button id="entrySubmitBtn" type="submit" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition">Acessar sistema</button>
             </form>
+            <p class="text-[10px] text-slate-500 text-center mt-5">O passaporte identifica seu cadastro. A gerência utiliza uma credencial master.</p>
         </div>
     </div>
 
@@ -399,72 +362,164 @@
         
         let catalog = JSON.parse(localStorage.getItem('gta_farm_catalog_v2')) || DEFAULT_ITEMS;
         let logs = JSON.parse(localStorage.getItem('gta_farm_logs_v2')) || [];
-        let goals = JSON.parse(localStorage.getItem('gta_farm_goals_v2')) || []; // [{member, item, target}]
+        let goals = JSON.parse(localStorage.getItem('gta_farm_goals_v2')) || [];
+        let members = JSON.parse(localStorage.getItem('gta_farm_members_v1')) || [];
+        let globalWeeklyGoal = Number(localStorage.getItem('gta_farm_global_goal_v1')) || 0;
         let currentImageData = null;
         let managerUnlocked = false;
+        let currentSession = null;
         let goalResetLogId = Number(localStorage.getItem('gta_farm_goal_reset_id_v2')) || 0;
         const MASTER_PASSWORD = '488457@';
 
-        function openManagerLogin() {
-            if (managerUnlocked) {
-                lockManager();
-                return;
-            }
-            document.getElementById('managerLoginError').classList.add('hidden');
-            document.getElementById('managerPasswordInput').value = '';
-            document.getElementById('managerLoginModal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('managerPasswordInput').focus(), 50);
-        }
-
-        function closeManagerLogin() {
-            document.getElementById('managerLoginModal').classList.add('hidden');
-        }
-
-        function unlockManager(event) {
+        function submitEntry(event) {
             event.preventDefault();
-            const entered = document.getElementById('managerPasswordInput').value;
-            if (entered !== MASTER_PASSWORD) {
-                document.getElementById('managerLoginError').classList.remove('hidden');
-                document.getElementById('managerPasswordInput').select();
+            const credential = document.getElementById('entryCredential').value.trim();
+            const error = document.getElementById('entryError');
+            const nameInput = document.getElementById('firstRegistrationName');
+            error.classList.add('hidden');
+
+            // A mesma tela reconhece a credencial master sem exibir botão de gerente.
+            if (credential === MASTER_PASSWORD) {
+                managerUnlocked = true;
+                currentSession = { passport: 'MASTER', name: 'Gerência', isManager: true };
+                enterSystem();
                 return;
             }
-            managerUnlocked = true;
-            closeManagerLogin();
-            document.getElementById('managerGoalsSection').classList.remove('hidden');
-            document.getElementById('managerHistorySection').classList.remove('hidden');
-            document.getElementById('managerAccessLabel').textContent = 'Bloquear Gerência';
-            document.getElementById('managerAccessBtn').classList.add('border-emerald-600', 'text-emerald-200');
-            renderGoals();
-            renderHistory();
-            showToast('Acesso da gerência liberado!');
+
+            if (!/^\\d{1,12}$/.test(credential)) {
+                error.textContent = 'Informe um passaporte numérico válido.';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            const found = members.find(member => String(member.passport) === credential);
+            if (found) {
+                currentSession = { ...found, isManager: false };
+                managerUnlocked = false;
+                enterSystem();
+                return;
+            }
+
+            // Primeiro acesso: solicitar nome e cadastrar o passaporte único.
+            if (nameInput.classList.contains('hidden')) {
+                nameInput.classList.remove('hidden');
+                nameInput.required = true;
+                nameInput.focus();
+                document.getElementById('entrySubmitBtn').textContent = 'Cadastrar e acessar';
+                error.textContent = 'Passaporte ainda não cadastrado. Informe seu nome para criar o cadastro.';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            const name = nameInput.value.trim();
+            if (!name) {
+                error.textContent = 'Informe seu nome ou apelido para concluir o cadastro.';
+                error.classList.remove('hidden');
+                return;
+            }
+            if (members.some(member => String(member.passport) === credential)) {
+                error.textContent = 'Este passaporte já está cadastrado.';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            const newMember = { passport: credential, name, createdAt: Date.now() };
+            const previousMembers = members;
+            members = [...members, newMember];
+            try {
+                localStorage.setItem('gta_farm_members_v1', JSON.stringify(members));
+                currentSession = { ...newMember, isManager: false };
+                enterSystem();
+                showToast('Cadastro criado com sucesso!');
+            } catch (err) {
+                members = previousMembers;
+                error.textContent = 'Não foi possível salvar o cadastro neste navegador.';
+                error.classList.remove('hidden');
+            }
         }
 
-        function lockManager() {
+        function enterSystem() {
+            document.getElementById('entryGate').classList.add('hidden');
+            document.getElementById('sessionBadge').textContent = currentSession.isManager
+                ? 'GERÊNCIA MASTER'
+                : `${currentSession.name} • Passaporte ${currentSession.passport}`;
+            document.getElementById('logoutBtn').classList.remove('hidden');
+
+            // Campo do membro fica vinculado à sessão; ninguém digita o nome a cada farm.
+            const memberField = document.getElementById('memberName');
+            memberField.value = currentSession.name;
+            memberField.readOnly = true;
+            memberField.classList.add('opacity-70');
+            const memberLabel = memberField.closest('div').parentElement.querySelector('label');
+            if (memberLabel) memberLabel.textContent = 'Membro identificado pela sessão';
+
+            if (managerUnlocked) {
+                document.getElementById('managerGoalsSection').classList.remove('hidden');
+                document.getElementById('managerHistorySection').classList.remove('hidden');
+                ['exportBtn','clearHistoryBtn','catalogManagerBtn'].forEach(id => document.getElementById(id).classList.remove('hidden'));
+                document.getElementById('globalWeeklyGoalInput').value = globalWeeklyGoal || '';
+                renderGoals();
+                renderHistory();
+            } else {
+                document.getElementById('managerGoalsSection').classList.add('hidden');
+                document.getElementById('managerHistorySection').classList.add('hidden');
+            }
+            renderStock();
+            renderCatalogSelects();
+            renderGoals();
+            lucide.createIcons();
+        }
+
+        function logoutSession() {
             managerUnlocked = false;
-            document.getElementById('managerGoalsSection').classList.add('hidden');
-            document.getElementById('managerHistorySection').classList.add('hidden');
-            document.getElementById('managerAccessLabel').textContent = 'Acesso Gerência';
-            document.getElementById('managerAccessBtn').classList.remove('border-emerald-600', 'text-emerald-200');
-            closeManagerLogin();
-            showToast('Área da gerência bloqueada.');
+            currentSession = null;
+            document.getElementById('entryCredential').value = '';
+            document.getElementById('firstRegistrationName').value = '';
+            document.getElementById('firstRegistrationName').classList.add('hidden');
+            document.getElementById('firstRegistrationName').required = false;
+            document.getElementById('entrySubmitBtn').textContent = 'Acessar sistema';
+            document.getElementById('sessionBadge').textContent = '';
+            document.getElementById('logoutBtn').classList.add('hidden');
+            ['exportBtn','clearHistoryBtn','catalogManagerBtn'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('entryGate').classList.remove('hidden');
         }
 
         function managerAction(action) {
-            if (!managerUnlocked) {
-                openManagerLogin();
+            if (!managerUnlocked || !currentSession?.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
                 return;
             }
             action();
         }
 
+        function saveGlobalGoal() {
+            if (!managerUnlocked || !currentSession?.isManager) return;
+            const value = Number(document.getElementById('globalWeeklyGoalInput').value);
+            if (!Number.isSafeInteger(value) || value <= 0) {
+                showToast('Informe uma meta semanal inteira maior que zero.', true);
+                return;
+            }
+            const oldValue = globalWeeklyGoal;
+            globalWeeklyGoal = value;
+            try {
+                localStorage.setItem('gta_farm_global_goal_v1', String(globalWeeklyGoal));
+                renderGoals();
+                showToast(`Meta geral definida: ${value.toLocaleString('pt-BR')} por item.`);
+            } catch (err) {
+                globalWeeklyGoal = oldValue;
+                showToast('Não foi possível salvar a meta geral.', true);
+            }
+        }
+
         function resetWeeklyGoals() {
-            if (!confirm('Resetar o progresso semanal de TODAS as metas? O histórico e o estoque serão mantidos.')) return;
+            if (!managerUnlocked || !currentSession?.isManager) return;
+            if (!confirm('Resetar o progresso semanal de todos os membros e itens? O histórico e o estoque serão mantidos.')) return;
             const previousReset = goalResetLogId;
             goalResetLogId = Date.now();
             try {
                 localStorage.setItem('gta_farm_goal_reset_id_v2', String(goalResetLogId));
                 renderGoals();
-                showToast('Progresso das metas semanais resetado!');
+                showToast('Progresso semanal resetado para todos!');
             } catch (error) {
                 goalResetLogId = previousReset;
                 showToast('Não foi possível salvar o reset semanal.', true);
@@ -478,6 +533,7 @@
             renderStock();
             renderGoals();
             renderHistory();
+            document.getElementById('entryCredential').focus();
         };
 
         function saveData() {
@@ -486,6 +542,8 @@
                 localStorage.setItem('gta_farm_catalog_v2', JSON.stringify(catalog));
                 localStorage.setItem('gta_farm_logs_v2', JSON.stringify(logs));
                 localStorage.setItem('gta_farm_goals_v2', JSON.stringify(goals));
+                localStorage.setItem('gta_farm_members_v1', JSON.stringify(members));
+                localStorage.setItem('gta_farm_global_goal_v1', String(globalWeeklyGoal));
                 return true;
             } catch (error) {
                 console.error('Erro ao salvar dados:', error);
@@ -587,7 +645,12 @@
         function handleFormSubmit(e) {
             e.preventDefault();
 
-            const member = document.getElementById('memberName').value.trim();
+            if (!currentSession || currentSession.isManager) {
+                showToast('Entre com seu passaporte de membro para registrar farm.', true);
+                return;
+            }
+            const member = currentSession.name;
+            const passport = currentSession.passport;
             const item = document.getElementById('itemSelect').value;
             const selectedOperation = document.querySelector('input[name="operation"]:checked');
             const operation = selectedOperation ? selectedOperation.value : 'ENTRY';
@@ -607,6 +670,7 @@
                 id: Date.now(),
                 timestamp: new Date().toLocaleString('pt-BR'),
                 member,
+                passport,
                 item,
                 operation,
                 quantity,
@@ -656,12 +720,14 @@
         }
 
         // CALCULOS DE ENTREGA INDIVIDUAL DE CADA MEMBRO (PARA A META)
-        function getMemberProgress(memberName, itemName) {
+        function getMemberProgress(passport, itemName, memberName = '') {
             let total = 0;
             logs.forEach(log => {
-                if (Number(log.id) > goalResetLogId && log.member.toLowerCase() === memberName.toLowerCase() && log.item === itemName) {
-                    if (log.operation === 'ENTRY') total += log.quantity;
-                    if (log.operation === 'EXIT') total -= log.quantity;
+                const sameMember = String(log.passport || '') === String(passport) ||
+                    (!log.passport && String(log.member || '').trim().toLowerCase() === String(memberName).trim().toLowerCase());
+                if (Number(log.id) > goalResetLogId && sameMember && log.item === itemName) {
+                    if (log.operation === 'ENTRY') total += Number(log.quantity) || 0;
+                    if (log.operation === 'EXIT') total -= Number(log.quantity) || 0;
                 }
             });
             return Math.max(0, total);
@@ -696,117 +762,82 @@
             lucide.createIcons();
         }
 
-        // RENDERIZAR PAINEL DE METAS
+        // RELATÓRIO GERENCIAL: META ÚNICA APLICADA A CADA ITEM PARA CADA MEMBRO
         function renderGoals() {
-            const goalsGrid = document.getElementById('goalsGrid');
-            const emptyMsg = document.getElementById('emptyGoalsMsg');
-            goalsGrid.innerHTML = '';
+            const body = document.getElementById('managerReportBody');
+            const empty = document.getElementById('managerReportEmpty');
+            const summary = document.getElementById('managerSummary');
+            if (!body || !empty || !summary) return;
 
-            if (goals.length === 0) {
-                emptyMsg.classList.remove('hidden');
+            body.innerHTML = '';
+            summary.innerHTML = '';
+
+            if (!managerUnlocked || !currentSession?.isManager) return;
+
+            const totalRows = members.length * catalog.length;
+            if (!members.length || !catalog.length || globalWeeklyGoal <= 0) {
+                empty.classList.remove('hidden');
+                empty.textContent = !members.length
+                    ? 'Nenhum membro cadastrado ainda.'
+                    : 'Defina a meta semanal geral para gerar o relatório.';
                 return;
-            } else {
-                emptyMsg.classList.add('hidden');
             }
+            empty.classList.add('hidden');
 
-            goals.forEach((goal, index) => {
-                const currentAmount = getMemberProgress(goal.member, goal.item);
-                const percent = Math.min(100, Math.round((currentAmount / goal.target) * 100));
-                const isCompleted = currentAmount >= goal.target;
+            let completed = 0;
+            let sumPercent = 0;
+            const rows = [];
 
-                const card = document.createElement('div');
-                card.className = `bg-slate-900 border ${isCompleted ? 'border-emerald-500/50' : 'border-slate-800'} rounded-xl p-4 flex flex-col justify-between relative shadow-lg`;
-                
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
-                                    <i data-lucide="user" class="w-3.5 h-3.5 text-purple-400"></i>
-                                    ${escapeHtml(goal.member)}
-                                </h3>
-                                <p class="text-[11px] text-slate-400">Meta: <span class="text-purple-300 font-semibold">${goal.item}</span></p>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                ${isCompleted ? `
-                                    <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                                        <i data-lucide="check" class="w-3 h-3"></i> Concluída
-                                    </span>
-                                ` : `
-                                    <span class="text-[10px] bg-purple-950 text-purple-300 border border-purple-800 px-2 py-0.5 rounded-full font-bold">
-                                        ${percent}%
-                                    </span>
-                                `}
-                                <button onclick="deleteGoal(${index})" class="text-slate-600 hover:text-red-400 p-1">
-                                    <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                        </div>
+            members.forEach(member => {
+                catalog.forEach(item => {
+                    const amount = getMemberProgress(member.passport, item, member.name);
+                    const rawPercent = (amount / globalWeeklyGoal) * 100;
+                    const percent = Math.round(rawPercent);
+                    const done = amount >= globalWeeklyGoal;
+                    if (done) completed++;
+                    sumPercent += Math.min(100, rawPercent);
+                    rows.push({ member, item, amount, percent, done });
+                });
+            });
 
-                        <!-- Barra de Progresso -->
-                        <div class="mt-3">
-                            <div class="flex justify-between text-[11px] text-slate-400 font-mono mb-1">
-                                <span>Entregue: <strong class="text-white">${currentAmount.toLocaleString('pt-BR')}</strong></span>
-                                <span>Objetivo: <strong class="text-white">${goal.target.toLocaleString('pt-BR')}</strong></span>
-                            </div>
-                            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
-                                <div class="h-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-purple-500'}" style="width: ${percent}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                goalsGrid.appendChild(card);
+            const average = totalRows ? Math.round(sumPercent / totalRows) : 0;
+            const cards = [
+                { label: 'Membros cadastrados', value: members.length.toLocaleString('pt-BR'), icon: 'users' },
+                { label: 'Metas concluídas', value: `${completed} / ${totalRows}`, icon: 'trophy' },
+                { label: 'Progresso médio', value: `${average}%`, icon: 'chart-no-axes-column-increasing' }
+            ];
+            cards.forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4';
+                el.innerHTML = `<div class="flex items-center justify-between text-slate-400 text-[11px]"><span>${card.label}</span><i data-lucide="${card.icon}" class="w-4 h-4 text-purple-400"></i></div><div class="text-2xl font-extrabold text-white mt-2">${card.value}</div>`;
+                summary.appendChild(el);
+            });
+
+            rows.sort((a,b) => a.member.name.localeCompare(b.member.name, 'pt-BR') || a.item.localeCompare(b.item, 'pt-BR'));
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const width = Math.min(100, row.percent);
+                tr.innerHTML = `
+                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(row.member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(row.member.passport)}</div></td>
+                    <td class="px-3 py-3">${escapeHtml(row.item)}</td>
+                    <td class="px-3 py-3 font-mono text-white">${row.amount.toLocaleString('pt-BR')}</td>
+                    <td class="px-3 py-3 font-mono">${globalWeeklyGoal.toLocaleString('pt-BR')}</td>
+                    <td class="px-3 py-3 min-w-[150px]"><div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${row.done ? 'bg-emerald-500' : 'bg-purple-500'}" style="width:${width}%"></div></div><span class="font-bold ${row.done ? 'text-emerald-400' : 'text-slate-300'}">${row.percent}%</span></div></td>
+                    <td class="px-3 py-3">${row.done ? '<span class="text-emerald-400 font-bold">Concluída</span>' : '<span class="text-amber-400">Em andamento</span>'}</td>`;
+                body.appendChild(tr);
             });
             lucide.createIcons();
         }
 
-        // GERENCIAR METAS
-        function openGoalModal() {
-            if (!managerUnlocked) { openManagerLogin(); return; }
-            renderCatalogSelects();
-            document.getElementById('goalModal').classList.remove('hidden');
-        }
-
-        function closeGoalModal() {
-            document.getElementById('goalModal').classList.add('hidden');
-        }
-
-        function handleSaveGoal(e) {
-            if (!managerUnlocked) { openManagerLogin(); return; }
-            e.preventDefault();
-            const member = document.getElementById('goalMemberInput').value.trim();
-            const item = document.getElementById('goalItemSelect').value;
-            const target = parseInt(document.getElementById('goalTargetInput').value, 10);
-
-            if (!member || !item || isNaN(target) || target <= 0) {
-                showToast('Preencha os dados da meta adequadamente.', true);
-                return;
-            }
-
-            // Atualiza meta se já existir ou adiciona nova
-            const existingIndex = goals.findIndex(g => g.member.toLowerCase() === member.toLowerCase() && g.item === item);
-            if (existingIndex >= 0) {
-                goals[existingIndex].target = target;
-            } else {
-                goals.push({ member, item, target });
-            }
-
-            saveData();
-            renderGoals();
-            closeGoalModal();
-            showToast('Meta definida com sucesso!');
-        }
-
-        function deleteGoal(index) {
-            if (!managerUnlocked) { openManagerLogin(); return; }
-            goals.splice(index, 1);
-            saveData();
-            renderGoals();
-            showToast('Meta removida!');
-        }
+        // Funções antigas de meta individual ficam desativadas por compatibilidade.
+        function openGoalModal() { showToast('Agora a meta é única e definida no painel da gerência.', true); }
+        function closeGoalModal() {}
+        function handleSaveGoal(e) { e.preventDefault(); }
+        function deleteGoal(index) {}
 
         // RENDERIZAR HISTÓRICO
         function renderHistory() {
+            if (!managerUnlocked || !currentSession?.isManager) return;
             const tbody = document.getElementById('historyTableBody');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const emptyMsg = document.getElementById('emptyHistoryMsg');
@@ -868,7 +899,7 @@
         }
 
         function deleteLog(id) {
-            if (!managerUnlocked) { openManagerLogin(); return; }
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
             logs = logs.filter(log => log.id !== id);
             saveData();
             renderStock();
@@ -893,7 +924,7 @@
         }
 
         function openCatalogModal() {
-            if (!managerUnlocked) { openManagerLogin(); return; }
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
             renderCatalogList();
             document.getElementById('catalogModal').classList.remove('hidden');
         }
@@ -921,7 +952,7 @@
         }
 
         function addNewCatalogItem() {
-            if (!managerUnlocked) { openManagerLogin(); return; }
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
             const input = document.getElementById('newItemInput');
             const name = input.value.trim();
 
@@ -942,7 +973,7 @@
         }
 
         function removeCatalogItem(index) {
-            if (!managerUnlocked) { openManagerLogin(); return; }
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
             catalog.splice(index, 1);
             saveData();
             renderCatalogSelects();
@@ -963,7 +994,7 @@
 
         // EXPORTAR CSV
         function exportData() {
-            if (!managerUnlocked) { openManagerLogin(); return; }
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
             if (logs.length === 0) {
                 showToast('Sem registros para exportar.', true);
                 return;
@@ -988,7 +1019,7 @@
 
         // RESETAR HISTÓRICO
         function clearHistory() {
-            if (!managerUnlocked) { openManagerLogin(); return; }
+            if (!managerUnlocked || !currentSession?.isManager) { showToast('Ação exclusiva da gerência.', true); return; }
             if (confirm("Deseja apagar TODO o histórico? Isso irá zerar o estoque e o progresso das metas.")) {
                 logs = [];
                 saveData();
