@@ -228,6 +228,79 @@
         .neon-ring {
             box-shadow: 0 0 0 1px rgba(56, 200, 245, .35), 0 0 26px -6px rgba(56, 200, 245, .55);
         }
+
+        /* ---------- avisos da gerência ---------- */
+        .ann-banner {
+            border-radius: 1rem;
+            border: 1px solid #fecdd3;
+            background: linear-gradient(135deg, #fff1f3 0%, #ffe4e6 100%);
+            box-shadow: 0 20px 44px -30px rgba(225, 29, 72, .85);
+        }
+        .ann-banner .ann-title { color: #be123c; }
+        .ann-banner .ann-text { color: #881337; }
+        .ann-banner .ann-meta { color: #9f1239; opacity: .75; }
+        .ann-banner.kind-retirada { border-color: #fda4af; background: linear-gradient(135deg, #fff1f3 0%, #ffe4e6 100%); }
+        .ann-banner.kind-entrega  { border-color: #7dd3fc; background: linear-gradient(135deg, #e8f8ff 0%, #d7f3ff 100%); }
+        .ann-banner.kind-entrega .ann-title { color: #0369a1; }
+        .ann-banner.kind-entrega .ann-text  { color: #075985; }
+        .ann-banner.kind-entrega .ann-meta  { color: #0c4a6e; }
+        .ann-banner.kind-aviso { border-color: #fcd34d; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); }
+        .ann-banner.kind-aviso .ann-title { color: #b45309; }
+        .ann-banner.kind-aviso .ann-text  { color: #92400e; }
+        .ann-banner.kind-aviso .ann-meta  { color: #92400e; }
+
+        /* ---------- fileira do membro no baú ---------- */
+        .slot-card {
+            border-radius: 1rem;
+            border: 1px solid #7fe0ff;
+            background: linear-gradient(135deg, #54d4f8 0%, #0ea5e9 55%, #0369a1 100%);
+            color: #ffffff;
+            box-shadow: 0 0 0 1px rgba(56, 200, 245, .35), 0 18px 40px -22px rgba(14, 165, 233, .8);
+        }
+        .slot-card .slot-label { color: #e0f7ff; }
+        .slot-card .slot-hint { color: #dff4ff; }
+        .slot-card .slot-num {
+            font-size: 4.25rem;
+            line-height: .85;
+            font-weight: 800;
+            letter-spacing: -.04em;
+            text-shadow: 0 6px 18px rgba(3, 105, 161, .55);
+        }
+        .slot-card.warn { border-color: #fcd34d; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+        .slot-card.warn .slot-label, .slot-card.warn .slot-hint { color: #fff7ed; }
+
+        /* ---------- mapa das fileiras ---------- */
+        .bau-cell {
+            border-radius: .6rem;
+            border: 1px solid #d8eefb;
+            padding: .45rem .55rem;
+            font-size: 11px;
+            line-height: 1.15;
+        }
+        .bau-cell.used { background: #e8f8ff; border-color: #7dd3fc; color: #075985; font-weight: 700; }
+        .bau-cell.free { background: #f7fdff; border-style: dashed; color: #6f8fa0; }
+        .bau-cell.over { background: #fff1f3; border-color: #fda4af; color: #be123c; font-weight: 700; }
+        .bau-cell.picked {
+            background: linear-gradient(135deg, #54d4f8 0%, #0ea5e9 100%);
+            border-color: #0369a1;
+            color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(56, 200, 245, .45);
+        }
+        .picked-row { border-color: #0ea5e9 !important; box-shadow: 0 0 0 1px rgba(56, 200, 245, .45); }
+        .slot-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: .25rem;
+            background: linear-gradient(135deg, #54d4f8 0%, #0ea5e9 100%);
+            color: #fff;
+            font-weight: 800;
+            font-size: 10px;
+            padding: .15rem .45rem;
+            border-radius: .4rem;
+            cursor: pointer;
+        }
+        .slot-chip:hover { filter: brightness(1.08); }
+        .slot-chip.empty { background: #eaf7ff; color: #0e7490; border: 1px dashed #7dd3fc; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
@@ -272,6 +345,40 @@
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
 
+        <!-- AVISO DA GERÊNCIA PARA TODOS OS MEMBROS -->
+        <section id="announcementBanner" class="hidden ann-banner p-4 flex items-start gap-3">
+            <span class="shrink-0 w-11 h-11 rounded-xl bg-white/70 border border-white/60 flex items-center justify-center">
+                <i data-lucide="megaphone" class="w-6 h-6 text-red-600"></i>
+            </span>
+            <div class="min-w-0 flex-1">
+                <div class="ann-title text-[11px] font-extrabold uppercase tracking-widest">Aviso da gerência</div>
+                <p id="announcementText" class="ann-text text-sm font-bold mt-1 whitespace-pre-line"></p>
+                <div id="announcementMeta" class="ann-meta text-[10px] mt-1"></div>
+            </div>
+        </section>
+
+        <!-- FILEIRA DO MEMBRO NO BAÚ (aviso bem visível para não errar a fileira) -->
+        <section id="memberSlotSection" class="hidden slot-card p-5">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-5 justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 border border-white/40 flex items-center justify-center">
+                        <i data-lucide="rows-3" class="w-7 h-7 sm:w-8 sm:h-8"></i>
+                    </span>
+                    <div>
+                        <div class="slot-label text-[11px] font-extrabold uppercase tracking-widest">Sua fileira no baú</div>
+                        <div class="text-sm font-bold slot-hint mt-0.5">Coloque a print do farm sempre nesta fileira:</div>
+                        <div id="memberSlotHint" class="text-[11px] font-semibold slot-hint mt-1"></div>
+                    </div>
+                </div>
+                <div class="shrink-0 flex items-center gap-3 sm:flex-col sm:items-end">
+                    <div class="flex items-baseline gap-2">
+                        <span id="memberSlotNumber" class="slot-num">#--</span>
+                        <span class="slot-label text-xs font-bold uppercase tracking-wider hidden sm:inline">fileira</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 1. DASHBOARD DE ESTOQUE ATUAL -->
         <section>
             <div class="flex items-center justify-between mb-4">
@@ -310,6 +417,9 @@
                     <button onclick="resetWeeklyGoals()" class="px-3 py-2 bg-amber-700 hover:bg-amber-600 text-white text-xs font-bold rounded-lg">Resetar semana</button>
                     <button onclick="managerAction(openMembersModal)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg border border-slate-700 transition flex items-center gap-1.5">
                         <i data-lucide="users" class="w-4 h-4"></i> Gerenciar membros
+                    </button>
+                    <button onclick="managerAction(openAnnouncementModal)" class="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5">
+                        <i data-lucide="megaphone" class="w-4 h-4"></i> Avisar membros
                     </button>
                 </div>
             </div>
@@ -420,6 +530,7 @@
                                     <i data-lucide="camera" class="w-6 h-6 text-slate-400 mb-1"></i>
                                     <p class="text-xs text-slate-400"><span class="font-bold text-emerald-400">Clique para anexar</span> a print da foto no baú</p>
                                     <p class="text-[10px] text-slate-500">Formatos aceitos: PNG, JPG, WEBP (até 10MB)</p>
+                                    <p id="uploadSlotHint" class="hidden text-[11px] font-extrabold text-emerald-400"></p>
                                 </div>
                                 <input id="imageInput" type="file" accept="image/*" class="hidden" onchange="previewImage(event)">
                             </label>
@@ -528,7 +639,7 @@
 
     <!-- MODAL: GERENCIAR MEMBROS -->
     <div id="membersModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-brand-cardBg border border-brand-border rounded-xl max-w-lg w-full p-5 shadow-2xl">
+        <div class="bg-brand-cardBg border border-brand-border rounded-xl max-w-2xl w-full p-5 shadow-2xl max-h-[92vh] flex flex-col">
             <div class="flex justify-between items-center pb-3 border-b border-slate-800">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                     <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
@@ -540,9 +651,84 @@
             </div>
             <p class="text-[11px] text-slate-400 mt-3">Excluir remove o cadastro do painel. O histórico de farm e as fotos continuam salvos.</p>
             <p id="membersCount" class="text-[11px] text-emerald-400 mt-1"></p>
+
+            <!-- FILEIRAS DO BAÚ -->
+            <div class="mt-3 bg-slate-900/50 border border-slate-800 rounded-xl p-3">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                        <div class="text-xs font-bold text-white flex items-center gap-2">
+                            <i data-lucide="rows-3" class="w-4 h-4 text-emerald-400"></i> Fileiras do baú
+                        </div>
+                        <div id="bauRowsSummary" class="text-[10px] text-slate-500 mt-0.5"></div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="bauRowsInput" class="text-[10px] text-slate-400">Fileiras físicas</label>
+                        <input id="bauRowsInput" type="number" min="1" max="200" class="w-20 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white">
+                        <button onclick="saveBauRows()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold">Salvar</button>
+                    </div>
+                </div>
+                <div id="bauMap" class="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>
+                <p id="bauPickHint" class="text-[10px] text-slate-500 mt-2">Clique em um membro (ou na fileira dele no mapa) e depois na fileira de destino.</p>
+            </div>
+
             <div class="max-h-72 overflow-y-auto space-y-2 pr-1 mt-3" id="membersList"></div>
             <div class="pt-3 mt-3 border-t border-slate-800 text-right">
                 <button onclick="closeMembersModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg font-medium">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AVISO DA GERÊNCIA PARA TODOS OS MEMBROS -->
+    <div id="announcementModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-brand-cardBg border border-brand-border rounded-xl max-w-lg w-full p-5 shadow-2xl max-h-[92vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i data-lucide="megaphone" class="w-4 h-4 text-purple-400"></i>
+                    Avisar todos os membros
+                </h3>
+                <button onclick="closeAnnouncementModal()" class="text-slate-400 hover:text-white">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="py-4 space-y-4 overflow-y-auto">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Tipo de aviso</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="annKind" value="RETIRADA" checked class="peer sr-only" onchange="syncAnnouncementPreset()">
+                            <div class="w-full text-center py-2 rounded-lg text-[11px] font-bold border border-slate-700 bg-slate-900 text-slate-300 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-500 transition">Retirei do baú</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="annKind" value="ENTREGA" class="peer sr-only" onchange="syncAnnouncementPreset()">
+                            <div class="w-full text-center py-2 rounded-lg text-[11px] font-bold border border-slate-700 bg-slate-900 text-slate-300 peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-500 transition">Coloquei no baú</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="annKind" value="AVISO" class="peer sr-only" onchange="syncAnnouncementPreset()">
+                            <div class="w-full text-center py-2 rounded-lg text-[11px] font-bold border border-slate-700 bg-slate-900 text-slate-300 peer-checked:bg-amber-700 peer-checked:text-white peer-checked:border-amber-600 transition">Aviso geral</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="announcementInput" class="block text-xs font-semibold text-slate-300 mb-1">Mensagem para todos os membros</label>
+                    <textarea id="announcementInput" rows="3" maxlength="400" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Ex.: Retirei o farm do baú. Passem no NPC para pegar."></textarea>
+                    <p class="text-[10px] text-slate-500 mt-1">Aparece em destaque no topo da tela de todos os membros (a página atualiza sozinha a cada 1 minuto).</p>
+                </div>
+
+                <button onclick="postAnnouncement()" class="w-full px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-2">
+                    <i data-lucide="send" class="w-4 h-4"></i> Enviar aviso para todos
+                </button>
+
+                <div class="pt-2 border-t border-slate-800">
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Avisos enviados</div>
+                    <div id="announcementHistory" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+                <button onclick="clearAnnouncements()" class="px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-red-300 text-xs font-semibold rounded-lg border border-red-800/50">Apagar aviso atual</button>
+                <button onclick="closeAnnouncementModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded-lg font-medium">Fechar</button>
             </div>
         </div>
     </div>
@@ -611,7 +797,16 @@
         let catalog = [];
         let logs = [];
         let members = [];
-        let settings = { global_goal: 0, reset_at: null };
+        let announcements = [];
+        let settings = { global_goal: 0, reset_at: null, bau_rows: 14 };
+        let bauRows = 14;          // quantas fileiras físicas existem no baú
+        let slotsReady = true;     // false quando a coluna "slot" ainda não existe no banco
+        let noticesReady = true;   // false quando a tabela de avisos ainda não existe no banco
+        let pickedPassport = null; // membro "selecionado" aguardando a fileira de destino
+        let lastDataSignature = ''; // evita redesenhar a tela quando nada mudou
+        let lastSlotHtml = '';      // evita redesenhar o card da fileira sem necessidade
+        let lastFullLoadAt = Date.now();
+        const FULL_RELOAD_MS = 15 * 60 * 1000; // recarrega tudo do zero a cada 15 min
 
         let currentImageBlob = null;
         let currentSession = null;
@@ -699,28 +894,107 @@
         }
 
         // ---------- leitura do banco ----------
-        async function loadRemoteData() {
+        // Lê os membros com a fileira (slot). Se a coluna ainda não existir no
+        // banco (SQL de atualização não rodado), lê sem ela e avisa na tela.
+        async function loadMembers() {
+            let res = await sb.from('farm_members').select('passport,name,slot').order('name', { ascending: true });
+            if (res.error) {
+                res = await sb.from('farm_members').select('passport,name').order('name', { ascending: true });
+                if (res.error) throw res.error;
+                slotsReady = false;
+                members = res.data || [];
+                return members;
+            }
+            slotsReady = true;
+            members = res.data || [];
+            return members;
+        }
+
+        // Lê os avisos da gerência. Se a tabela ainda não existir, segue sem avisos.
+        async function loadAnnouncements() {
+            const res = await sb.from('farm_announcements')
+                .select('id,kind,message,created_at,created_by,active')
+                .order('created_at', { ascending: false })
+                .limit(20);
+            if (res.error) {
+                noticesReady = false;
+                announcements = [];
+                return announcements;
+            }
+            noticesReady = true;
+            announcements = res.data || [];
+            return announcements;
+        }
+
+        // Lê as configurações. Se a coluna "bau_rows" ainda não existir no banco
+        // (SQL de atualização não rodado), usa o padrão de 14 fileiras.
+        async function loadSettings() {
+            let res = await sb.from('farm_settings').select('global_goal,reset_at,bau_rows').eq('id', 1).maybeSingle();
+            if (res.error) {
+                res = await sb.from('farm_settings').select('global_goal,reset_at').eq('id', 1).maybeSingle();
+                if (res.error) throw res.error;
+                return { ...(res.data || {}), bau_rows: 14 };
+            }
+            return res.data || { global_goal: 0, reset_at: null, bau_rows: 14 };
+        }
+
+        // Carrega só os registros NOVOS (mais rápido na atualização automática).
+        // Quando forceFull é true, recarrega tudo do zero.
+        async function loadLogs(forceFull = false) {
+            let lastId = 0;
+            logs.forEach(log => {
+                const id = Number(log.id) || 0;
+                if (id > lastId) lastId = id;
+            });
+
+            if (!forceFull && lastId > 0) {
+                const res = await sb.from('farm_logs')
+                    .select('id,created_at,passport,member,item,operation,quantity,image_url')
+                    .gt('id', lastId)
+                    .order('created_at', { ascending: false })
+                    .order('id', { ascending: false })
+                    .limit(500);
+                if (res.error) return res;
+
+                const novos = res.data || [];
+                if (novos.length) logs = [...novos, ...logs].slice(0, 5000);
+                return { data: [], error: null };
+            }
+
+            const res = await sb.from('farm_logs')
+                .select('id,created_at,passport,member,item,operation,quantity,image_url')
+                .order('created_at', { ascending: false })
+                .order('id', { ascending: false })
+                .limit(5000);
+            if (res.error) return res;
+
+            logs = res.data || [];
+            return { data: logs, error: null };
+        }
+
+        async function loadRemoteData(forceFull = false) {
             if (!sb) return false;
             updateSyncBadge('loading');
             try {
-                const [catalogRes, membersRes, settingsRes, logsRes] = await Promise.all([
+                const [catalogRes, membersRes, settingsRes, logsRes, noticesRes] = await Promise.all([
                     sb.from('farm_catalog').select('id,name').order('id', { ascending: true }),
-                    sb.from('farm_members').select('passport,name').order('name', { ascending: true }),
-                    sb.from('farm_settings').select('global_goal,reset_at').eq('id', 1).maybeSingle(),
-                    sb.from('farm_logs')
-                        .select('id,created_at,passport,member,item,operation,quantity,image_url')
-                        .order('created_at', { ascending: false })
-                        .order('id', { ascending: false })
-                        .limit(5000)
+                    loadMembers(),
+                    loadSettings(),
+                    loadLogs(forceFull),
+                    loadAnnouncements()
                 ]);
 
                 const firstError = catalogRes.error || membersRes.error || settingsRes.error || logsRes.error;
                 if (firstError) throw firstError;
 
                 catalog = (catalogRes.data || []).map(row => row.name);
-                members = membersRes.data || [];
-                settings = settingsRes.data || { global_goal: 0, reset_at: null };
-                logs = logsRes.data || [];
+                members = Array.isArray(membersRes) ? membersRes : (membersRes.data || []);
+                settings = settingsRes || { global_goal: 0, reset_at: null, bau_rows: 14 };
+                if (settings.bau_rows === undefined || settings.bau_rows === null) {
+                    settings.bau_rows = 14;
+                }
+                bauRows = Number(settings.bau_rows) || 14;
+                announcements = noticesRes || [];
                 dataLoaded = true;
                 updateSyncBadge('ok');
                 return true;
@@ -731,18 +1005,64 @@
             }
         }
 
+        // ---------- atualização automática ----------
+        // Assinatura dos dados: se nada mudou, a tela NÃO é redesenhada.
+        // Isso deixa a atualização automática (a cada 1 minuto) bem leve.
+        function dataSignature() {
+            const memberSig = members.map(member => `${member.passport}:${slotOf(member) || 0}`).join(',');
+            const noticeSig = announcements.map(item => `${item.id}:${item.active ? 1 : 0}`).join(',');
+            const logSig = logs.length ? `${logs.length}:${logs[0].id}` : '0';
+            return [
+                catalog.length, memberSig, noticeSig, logSig,
+                settings.global_goal || 0, settings.reset_at || ''
+            ].join('|');
+        }
+
         async function refreshData(silent = false) {
             if (!sb) return;
-            const ok = await loadRemoteData();
+
+            // A cada 15 minutos recarrega tudo do zero (garante que nada foi
+            // apagado por outra pessoa). No meio disso, busca só o que é novo.
+            const forceFull = (Date.now() - lastFullLoadAt) > FULL_RELOAD_MS;
+            const ok = await loadRemoteData(forceFull);
+            if (forceFull) lastFullLoadAt = Date.now();
+
             if (!ok) {
                 if (!silent) showToast('Não foi possível atualizar. Verifique a internet.', true);
                 return;
             }
+
+            // Nada mudou -> não redesenha nada (mantém a tela leve).
+            if (dataSignature() === lastDataSignature) {
+                if (!silent) showToast('Dados atualizados!');
+                return;
+            }
+
             renderAll();
             if (!silent) showToast('Dados atualizados!');
         }
 
         // ---------- login / sessão ----------
+        // Cadastra um novo membro. A fileira (slot) é sorteada pelo banco:
+        // todo mundo novo entra na próxima fileira do baú.
+        async function insertMember(passport, name) {
+            const { error } = await sb.from('farm_members').insert({ passport, name });
+            if (error) throw error;
+
+            const res = await sb.from('farm_members')
+                .select('passport,name,slot')
+                .eq('passport', passport)
+                .maybeSingle();
+
+            if (res.error) {
+                // Banco ainda sem a coluna de fileira: segue sem ela.
+                slotsReady = false;
+                return { passport, name };
+            }
+
+            return res.data || { passport, name };
+        }
+
         async function submitEntry(event) {
             event.preventDefault();
 
@@ -809,8 +1129,10 @@
                     return;
                 }
 
-                const { error: insertError } = await sb.from('farm_members').insert({ passport: credential, name });
-                if (insertError) {
+                let created = null;
+                try {
+                    created = await insertMember(credential, name);
+                } catch (insertError) {
                     // Se outra pessoa cadastrou esse passaporte enquanto a página estava aberta.
                     if (insertError.code === '23505' || /duplicate/i.test(insertError.message || '')) {
                         await loadRemoteData();
@@ -825,8 +1147,8 @@
                     throw insertError;
                 }
 
-                members = [...members, { passport: credential, name }];
-                currentSession = { passport: credential, name, isManager: false };
+                members = [...members.filter(item => String(item.passport) !== String(created.passport)), created];
+                currentSession = { passport: created.passport, name: created.name, isManager: false };
                 managerUnlocked = false;
                 enterSystem();
                 showToast('Cadastro criado com sucesso!');
@@ -886,6 +1208,7 @@
             document.getElementById('syncBadge').classList.add('hidden');
             ['exportBtn', 'clearHistoryBtn', 'catalogManagerBtn', 'importBtn'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById('entryGate').classList.remove('hidden');
+            renderMySlot();
             hideEntryError();
         }
 
@@ -907,7 +1230,10 @@
             renderStock();
             renderGoals();
             renderHistory();
+            renderAnnouncement();
+            renderMySlot();
             lucide.createIcons();
+            lastDataSignature = dataSignature();
         }
 
         window.onload = async function () {
@@ -1030,6 +1356,507 @@
                 stockGrid.appendChild(card);
             });
             lucide.createIcons();
+        }
+
+        // =====================================================================
+        //  AVISOS DA GERÊNCIA  +  FILEIRAS DO BAÚ
+        // =====================================================================
+
+        // A fileira (slot) de um membro. Null quando o banco ainda não tem a coluna.
+        function slotOf(member) {
+            if (!member) return null;
+            const value = Number(member.slot);
+            return Number.isFinite(value) && value > 0 ? value : null;
+        }
+
+        // Membro que ocupa uma determinada fileira.
+        function memberInSlot(slot) {
+            return members.find(member => slotOf(member) === Number(slot)) || null;
+        }
+
+        // Aviso ativo da gerência (o mais recente em cima).
+        function activeAnnouncement() {
+            return announcements.find(item => item.active) || null;
+        }
+
+        // ---------- avisos (todos os membros) ----------
+        function renderAnnouncement() {
+            const banner = document.getElementById('announcementBanner');
+            if (!banner) return;
+
+            const notice = activeAnnouncement();
+            if (!notice) {
+                banner.classList.add('hidden');
+                return;
+            }
+
+            const kind = ['RETIRADA', 'ENTREGA', 'AVISO'].includes(notice.kind) ? notice.kind : 'AVISO';
+            const titles = {
+                RETIRADA: 'Aviso da gerência — retirei o farm do baú',
+                ENTREGA: 'Aviso da gerência — coloquei o farm no baú',
+                AVISO: 'Aviso da gerência'
+            };
+
+            banner.className = 'ann-banner kind-' + kind.toLowerCase() + ' p-4 flex items-start gap-3';
+            document.getElementById('announcementText').textContent = notice.message;
+            document.getElementById('announcementMeta').textContent =
+                `${titles[kind]} • ${formatDateTime(notice.created_at)}`;
+            banner.classList.remove('hidden');
+        }
+
+        // ---------- fileira do membro (aviso bem visível) ----------
+        function renderMySlot() {
+            const section = document.getElementById('memberSlotSection');
+            const uploadHint = document.getElementById('uploadSlotHint');
+            if (!section) return;
+
+            if (!currentSession) {
+                section.classList.add('hidden');
+                if (uploadHint) uploadHint.classList.add('hidden');
+                lastSlotHtml = '';
+                return;
+            }
+
+            // Monta o conteúdo do card; só redesenha se algo mudou (evita tremida).
+            let html = '';
+            let cssClass = 'slot-card p-5';
+
+            if (currentSession.isManager) {
+                // Gerência: mostra a ocupação do baú.
+                const occupied = members.filter(member => slotOf(member)).length;
+                const highest = members.reduce((max, member) => Math.max(max, slotOf(member) || 0), 0);
+                const free = Math.max(0, bauRows - occupied);
+
+                html = `
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                        <div class="flex items-center gap-4">
+                            <span class="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 border border-white/40 flex items-center justify-center">
+                                <i data-lucide="rows-3" class="w-7 h-7 sm:w-8 sm:h-8"></i>
+                            </span>
+                            <div>
+                                <div class="slot-label text-[11px] font-extrabold uppercase tracking-widest">Mapa do baú</div>
+                                <div class="text-sm font-bold slot-hint mt-0.5">${occupied} fileira(s) ocupada(s) de ${bauRows} — ${free} livre(s)</div>
+                                <div class="text-[11px] font-semibold slot-hint mt-1">Última fileira usada: ${highest || 0}</div>
+                            </div>
+                        </div>
+                        <button onclick="managerAction(openMembersModal)" class="shrink-0 px-4 py-2 bg-white/20 hover:bg-white/30 border border-white/40 text-white text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5">
+                            <i data-lucide="users" class="w-4 h-4"></i> Ver fileiras
+                        </button>
+                    </div>`;
+                if (uploadHint) uploadHint.classList.add('hidden');
+            } else {
+                const slot = slotOf(currentSession);
+
+                if (!slot) {
+                    // Membro sem fileira definida.
+                    cssClass = 'slot-card warn p-5';
+                    html = `
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+                            <div class="flex items-center gap-4">
+                                <span class="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/25 border border-white/50 flex items-center justify-center">
+                                    <i data-lucide="triangle-alert" class="w-7 h-7 sm:w-8 sm:h-8"></i>
+                                </span>
+                                <div>
+                                    <div class="slot-label text-[11px] font-extrabold uppercase tracking-widest">Fileira do baú</div>
+                                    <div class="text-sm font-bold slot-hint mt-0.5">${slotsReady
+                                        ? 'Sua fileira ainda não foi definida. Fale com a gerência.'
+                                        : 'Rode o arquivo "atualizacao-fileiras-e-avisos.sql" no Supabase para ativar as fileiras.'}</div>
+                                </div>
+                            </div>
+                        </div>`;
+                    if (uploadHint) uploadHint.classList.add('hidden');
+                } else {
+                    // Membro com fileira: mostra o número bem grande.
+                    const overLimit = slot > bauRows;
+                    const hint = overLimit
+                        ? `Atenção: o baú tem ${bauRows} fileira(s). Peça para a gerência criar a fileira ${slot}.`
+                        : `Fileira ${slot} de ${bauRows}. Use sempre esta posição do baú para as prints.`;
+
+                    if (overLimit) cssClass = 'slot-card warn p-5';
+                    html = `
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-5 justify-between">
+                            <div class="flex items-center gap-4">
+                                <span class="shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/20 border border-white/40 flex items-center justify-center">
+                                    <i data-lucide="rows-3" class="w-7 h-7 sm:w-8 sm:h-8"></i>
+                                </span>
+                                <div>
+                                    <div class="slot-label text-[11px] font-extrabold uppercase tracking-widest">Sua fileira no baú</div>
+                                    <div class="text-sm font-bold slot-hint mt-0.5">Coloque a print do farm sempre nesta fileira:</div>
+                                    <div class="text-[11px] font-semibold slot-hint mt-1">${escapeHtml(hint)}</div>
+                                </div>
+                            </div>
+                            <div class="shrink-0 flex items-baseline gap-2 sm:flex-col sm:items-end">
+                                <span class="slot-num">#${slot}</span>
+                                <span class="slot-label text-[10px] font-bold uppercase tracking-wider">fileira</span>
+                            </div>
+                        </div>`;
+
+                    if (uploadHint) {
+                        uploadHint.textContent = `Print da fileira #${slot} do baú`;
+                        uploadHint.classList.remove('hidden');
+                    }
+                }
+            }
+
+            if (html !== lastSlotHtml) {
+                lastSlotHtml = html;
+                section.className = cssClass;
+                section.innerHTML = html;
+                lucide.createIcons();
+            }
+            section.classList.remove('hidden');
+        }
+
+        // ---------- avisos da gerência (gestão) ----------
+        const ANNOUNCEMENT_PRESETS = {
+            RETIRADA: 'Retirei o farm do baú. Passem no NPC para pegar o material.',
+            ENTREGA: 'Coloquei o farm no baú. Já podem retirar.',
+            AVISO: ''
+        };
+
+        function selectedAnnouncementKind() {
+            const checked = document.querySelector('input[name="annKind"]:checked');
+            return checked ? checked.value : 'RETIRADA';
+        }
+
+        function syncAnnouncementPreset() {
+            const input = document.getElementById('announcementInput');
+            if (!input) return;
+            const preset = ANNOUNCEMENT_PRESETS[selectedAnnouncementKind()];
+            if (preset) input.value = preset;
+        }
+
+        function openAnnouncementModal() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) {
+                showToast('Ação exclusiva da gerência.', true);
+                return;
+            }
+            syncAnnouncementPreset();
+            renderAnnouncementHistory();
+            document.getElementById('announcementModal').classList.remove('hidden');
+        }
+
+        function closeAnnouncementModal() {
+            const modal = document.getElementById('announcementModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function postAnnouncement() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+            const input = document.getElementById('announcementInput');
+            const message = input.value.trim();
+
+            if (!message) {
+                showToast('Escreva o aviso antes de enviar.', true);
+                return;
+            }
+
+            const button = document.querySelector('#announcementModal button[onclick="postAnnouncement()"]');
+            const originalHtml = button ? button.innerHTML : null;
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Enviando...';
+            }
+
+            try {
+                const { error } = await sb.rpc('farm_post_announcement', {
+                    p_password: managerPassword,
+                    p_message: message,
+                    p_kind: selectedAnnouncementKind()
+                });
+                if (error) throw error;
+
+                input.value = '';
+                await loadAnnouncements();
+                renderAnnouncement();
+                renderAnnouncementHistory();
+                showToast('Aviso enviado para todos os membros!');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível enviar o aviso. Rode o SQL de atualização no Supabase.', true);
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalHtml;
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        async function clearAnnouncements() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+            if (!confirm('Apagar o aviso atual da tela de todos os membros?')) return;
+
+            try {
+                const { error } = await sb.rpc('farm_clear_announcements', { p_password: managerPassword });
+                if (error) throw error;
+
+                await loadAnnouncements();
+                renderAnnouncement();
+                renderAnnouncementHistory();
+                showToast('Aviso apagado.');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível apagar o aviso. Rode o SQL de atualização no Supabase.', true);
+            }
+        }
+
+        function renderAnnouncementHistory() {
+            const container = document.getElementById('announcementHistory');
+            if (!container) return;
+
+            container.innerHTML = '';
+            if (!announcements.length) {
+                container.innerHTML = '<p class="text-[11px] text-slate-500">Nenhum aviso enviado ainda.</p>';
+                return;
+            }
+
+            const labels = { RETIRADA: 'Retirei do baú', ENTREGA: 'Coloquei no baú', AVISO: 'Aviso geral' };
+
+            announcements.slice(0, 8).forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'flex items-start gap-2 p-2 bg-slate-900 border border-slate-800 rounded-lg text-[11px]';
+                row.innerHTML = `
+                    <span class="font-bold shrink-0 ${item.active ? 'text-emerald-400' : 'text-slate-500'}">${escapeHtml(labels[item.kind] || 'Aviso')}</span>
+                    <span class="flex-1 text-slate-300">${escapeHtml(item.message)}</span>
+                    <span class="text-slate-500 shrink-0 hidden sm:inline">${escapeHtml(formatDateTime(item.created_at))}</span>
+                    <button type="button" class="delete-announcement-btn text-slate-500 hover:text-red-400 shrink-0" title="Apagar este aviso">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>`;
+                row.querySelector('.delete-announcement-btn').addEventListener('click', () => deleteAnnouncement(item.id, item.message));
+                container.appendChild(row);
+            });
+        }
+
+        async function deleteAnnouncement(id, message) {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+            if (!confirm('Apagar este aviso do histórico?\n\n"' + message + '"')) return;
+
+            try {
+                const { error } = await sb.rpc('farm_delete_announcement', {
+                    p_password: managerPassword,
+                    p_id: id
+                });
+                if (error) throw error;
+
+                await loadAnnouncements();
+                renderAnnouncement();
+                renderAnnouncementHistory();
+                showToast('Aviso apagado.');
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível apagar o aviso. Rode o SQL de atualização no Supabase.', true);
+            }
+        }
+
+        // ---------- fileiras do baú (gestão) ----------
+        // Fluxo simples, sem janelas e sem digitar número:
+        //   1) clica no membro (na lista ou na fileira dele no mapa)
+        //   2) clica na fileira de destino
+        // Se a fileira estiver ocupada, os dois trocam de lugar.
+        function pickMember(member) {
+            if (!member) return;
+            const passport = String(member.passport);
+            pickedPassport = (pickedPassport === passport) ? null : passport;
+            updatePickHighlight();
+        }
+
+        // Só troca o destaque (sem redesenhar a lista e o mapa -> mais rápido).
+        function updatePickHighlight() {
+            const picked = pickedMember();
+            const hint = document.getElementById('bauPickHint');
+
+            const map = document.getElementById('bauMap');
+            if (map) {
+                Array.from(map.children).forEach(cell => {
+                    const slot = Number(cell.dataset.slot);
+                    const passport = cell.dataset.passport || '';
+                    const isPicked = !!(picked && passport && passport === String(picked.passport));
+
+                    cell.classList.toggle('picked', isPicked);
+
+                    if (!passport) {
+                        const label = cell.lastElementChild;
+                        if (label) label.textContent = picked ? 'COLOCAR AQUI' : 'LIVRE';
+                        cell.title = picked ? `Mover ${picked.name} para a fileira ${slot}` : 'Fileira livre';
+                    } else {
+                        cell.title = picked && !isPicked
+                            ? `Mover ${picked.name} para a fileira ${slot}`
+                            : 'Selecionar para mover';
+                    }
+                });
+            }
+
+            const list = document.getElementById('membersList');
+            if (list) {
+                Array.from(list.children).forEach(row => {
+                    const isPicked = !!(picked && row.dataset.passport === String(picked.passport));
+                    row.classList.toggle('picked-row', isPicked);
+                });
+            }
+
+            if (hint) {
+                hint.textContent = picked
+                    ? `Movendo: ${picked.name} (fileira ${slotOf(picked) || '—'}) — clique na fileira de destino`
+                    : 'Clique em um membro (ou na fileira dele no mapa) e depois na fileira de destino.';
+                hint.className = picked
+                    ? 'text-[11px] font-extrabold text-emerald-400 mt-2'
+                    : 'text-[10px] text-slate-500 mt-2';
+            }
+        }
+
+        function pickedMember() {
+            if (!pickedPassport) return null;
+            return members.find(member => String(member.passport) === pickedPassport) || null;
+        }
+
+        async function moveMemberToSlot(passport, slot) {
+            const member = members.find(item => String(item.passport) === String(passport));
+            if (!member) return;
+
+            const target = Number(slot);
+            if (!Number.isSafeInteger(target) || target < 1) {
+                showToast('Fileira inválida.', true);
+                return;
+            }
+
+            const current = slotOf(member);
+            const occupant = memberInSlot(target);
+            const previousPick = pickedPassport;
+            pickedPassport = null;
+
+            if (current === target) {
+                renderMembersList();
+                renderBauMap();
+                return;
+            }
+
+            try {
+                const { error } = await sb.rpc('farm_set_member_slot', {
+                    p_password: managerPassword,
+                    p_passport: String(passport),
+                    p_slot: target
+                });
+                if (error) throw error;
+
+                await loadMembers();
+                renderMembersList();
+                renderBauMap();
+                renderMySlot();
+
+                if (occupant) {
+                    showToast(`${member.name} → fileira ${target} (${occupant.name} foi para a fileira ${current || 'livre'}).`);
+                } else {
+                    showToast(`${member.name} → fileira ${target}.`);
+                }
+            } catch (error) {
+                console.error(error);
+                pickedPassport = previousPick;
+                renderMembersList();
+                renderBauMap();
+                showToast('Não foi possível trocar a fileira. Rode o SQL de atualização no Supabase.', true);
+            }
+        }
+
+        function renderBauMap() {
+            const map = document.getElementById('bauMap');
+            if (!map) return;
+
+            const summary = document.getElementById('bauRowsSummary');
+            const input = document.getElementById('bauRowsInput');
+            const hint = document.getElementById('bauPickHint');
+            if (input && document.activeElement !== input) input.value = bauRows;
+
+            const occupied = members.filter(member => slotOf(member)).length;
+            const highest = members.reduce((max, member) => Math.max(max, slotOf(member) || 0), 0);
+            const total = Math.max(bauRows, highest);
+            const free = Math.max(0, total - occupied);
+
+            if (summary) {
+                summary.textContent = slotsReady
+                    ? `${occupied} ocupada(s) • ${free} livre(s) • última fileira usada: ${highest || 0}`
+                    : 'Rode o arquivo "atualizacao-fileiras-e-avisos.sql" no Supabase para ativar as fileiras.';
+            }
+
+            const picked = pickedMember();
+            if (hint) {
+                hint.textContent = picked
+                    ? `Movendo: ${picked.name} (fileira ${slotOf(picked) || '—'}) — clique na fileira de destino`
+                    : 'Clique em um membro (ou na fileira dele no mapa) e depois na fileira de destino.';
+                hint.className = picked
+                    ? 'text-[11px] font-extrabold text-emerald-400 mt-2'
+                    : 'text-[10px] text-slate-500 mt-2';
+            }
+
+            map.innerHTML = '';
+            for (let slot = 1; slot <= total; slot++) {
+                const member = memberInSlot(slot);
+                const cell = document.createElement('div');
+                const isPicked = picked && member && String(member.passport) === String(picked.passport);
+
+                cell.dataset.slot = slot;
+                cell.dataset.passport = member ? String(member.passport) : '';
+
+                if (member) {
+                    cell.className = 'bau-cell used cursor-pointer' + (isPicked ? ' picked' : '');
+                    cell.title = picked && !isPicked ? `Mover ${picked.name} para a fileira ${slot}` : 'Selecionar para mover';
+                    cell.innerHTML = `
+                        <div class="text-[9px] uppercase tracking-wider opacity-70">Fileira ${slot}</div>
+                        <div class="truncate">${escapeHtml(member.name)}</div>`;
+                    cell.addEventListener('click', () => {
+                        const atual = pickedMember();
+                        if (atual && String(atual.passport) !== String(member.passport)) {
+                            moveMemberToSlot(atual.passport, slot);
+                        } else {
+                            pickMember(member);
+                        }
+                    });
+                } else {
+                    cell.className = 'bau-cell free cursor-pointer';
+                    cell.title = picked ? `Mover ${picked.name} para a fileira ${slot}` : 'Fileira livre';
+                    cell.innerHTML = `
+                        <div class="text-[9px] uppercase tracking-wider opacity-60">Fileira ${slot}</div>
+                        <div>${picked ? 'COLOCAR AQUI' : 'LIVRE'}</div>`;
+                    cell.addEventListener('click', () => {
+                        const atual = pickedMember();
+                        if (atual) moveMemberToSlot(atual.passport, slot);
+                    });
+                }
+
+                map.appendChild(cell);
+            }
+        }
+
+        async function saveBauRows() {
+            if (!managerUnlocked || !currentSession || !currentSession.isManager) return;
+
+            const input = document.getElementById('bauRowsInput');
+            const rows = parseInt(input.value, 10);
+            if (!Number.isSafeInteger(rows) || rows < 1 || rows > 200) {
+                showToast('Informe um número de fileiras entre 1 e 200.', true);
+                return;
+            }
+
+            try {
+                const { error } = await sb.rpc('farm_set_bau_rows', { p_password: managerPassword, p_rows: rows });
+                if (error) throw error;
+
+                bauRows = rows;
+                settings.bau_rows = rows;
+                renderBauMap();
+                renderMySlot();
+                showToast(`Baú atualizado: ${rows} fileira(s).`);
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível salvar. Rode o SQL de atualização no Supabase.', true);
+            }
+        }
+
+        // Selo simples com a fileira do membro (usado nos relatórios da gerência).
+        function slotBadge(member) {
+            const slot = slotOf(member);
+            if (!slot) return '';
+            return ` <span class="text-[10px] font-bold text-emerald-400">• Fileira ${slot}</span>`;
         }
 
         let reportMember = '';
@@ -1173,7 +2000,7 @@
                 const tr = document.createElement('tr');
                 const width = Math.min(100, row.percent);
                 tr.innerHTML = `
-                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(member.passport)}</div></td>
+                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(member.name)}${slotBadge(member)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(member.passport)}</div></td>
                     <td class="px-3 py-3">${escapeHtml(row.item)}</td>
                     <td class="px-3 py-3 font-mono text-white">${row.amount.toLocaleString('pt-BR')}</td>
                     <td class="px-3 py-3 font-mono">${goal.toLocaleString('pt-BR')}</td>
@@ -1236,7 +2063,7 @@
                 const tr = document.createElement('tr');
                 const width = Math.min(100, row.percent);
                 tr.innerHTML = `
-                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(row.member.name)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(row.member.passport)}</div></td>
+                    <td class="px-3 py-3"><div class="font-semibold text-white">${escapeHtml(row.member.name)}${slotBadge(row.member)}</div><div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(row.member.passport)}</div></td>
                     <td class="px-3 py-3 font-mono">${row.completed} / ${catalog.length}</td>
                     <td class="px-3 py-3 font-mono text-white">${row.totalUnits.toLocaleString('pt-BR')}</td>
                     <td class="px-3 py-3 min-w-[170px]"><div class="flex items-center gap-2"><div class="h-2 flex-1 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${row.allDone ? 'bg-emerald-500' : 'bg-purple-500'}" style="width:${width}%"></div></div><span class="font-bold ${row.allDone ? 'text-emerald-400' : 'text-slate-300'}">${row.percent}%</span></div></td>
@@ -1401,6 +2228,7 @@
                 return;
             }
             renderMembersList();
+            renderBauMap();
             document.getElementById('membersModal').classList.remove('hidden');
         }
 
@@ -1422,21 +2250,39 @@
                 return;
             }
 
+            const picked = pickedMember();
+
             [...members]
-                .sort((a, b) => String(a.name).localeCompare(String(b.name), 'pt-BR'))
+                .sort((a, b) => {
+                    const slotA = slotOf(a) || 9999;
+                    const slotB = slotOf(b) || 9999;
+                    if (slotA !== slotB) return slotA - slotB;
+                    return String(a.name).localeCompare(String(b.name), 'pt-BR');
+                })
                 .forEach(member => {
+                    const slot = slotOf(member);
+                    const isPicked = picked && String(picked.passport) === String(member.passport);
                     const row = document.createElement('div');
-                    row.className = 'flex items-center justify-between gap-3 p-2.5 bg-slate-900 border border-slate-800 rounded-lg text-xs';
+                    row.dataset.passport = String(member.passport);
+                    row.className = 'flex items-center justify-between gap-3 p-2.5 bg-slate-900 border border-slate-800 rounded-lg text-xs' +
+                        (isPicked ? ' picked-row' : '');
                     row.innerHTML = `
                         <div class="min-w-0">
                             <div class="font-semibold text-white truncate">${escapeHtml(member.name)}</div>
                             <div class="text-[10px] text-slate-500">Passaporte ${escapeHtml(member.passport)}</div>
                         </div>
-                        <button type="button" class="delete-member-btn text-slate-500 hover:text-red-400 p-1 shrink-0" title="Excluir membro">
-                            <i data-lucide="user-x" class="w-4 h-4"></i>
-                        </button>
+                        <div class="flex items-center gap-2 shrink-0">
+                            ${slot
+                                ? `<span class="slot-chip" title="Clique para mover este membro de fileira"><i data-lucide="rows-3" class="w-3 h-3"></i> Fileira ${slot}</span>`
+                                : `<span class="slot-chip empty" title="Clique para escolher a fileira"><i data-lucide="rows-3" class="w-3 h-3"></i> sem fileira</span>`}
+                            <button type="button" class="delete-member-btn text-slate-500 hover:text-red-400 p-1" title="Excluir membro">
+                                <i data-lucide="user-x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     `;
                     row.querySelector('.delete-member-btn').addEventListener('click', () => deleteMember(member.passport, member.name));
+                    const chip = row.querySelector('.slot-chip');
+                    if (chip) chip.addEventListener('click', () => pickMember(member));
                     container.appendChild(row);
                 });
 
@@ -1461,6 +2307,8 @@
                 if (String(reportMember) === String(passport)) reportMember = '';
 
                 renderMembersList();
+                renderBauMap();
+                renderMySlot();
                 renderGoals();
                 showToast('Membro excluído.');
             } catch (error) {
@@ -1719,6 +2567,7 @@
                 closeImageModal();
                 closeCatalogModal();
                 closeMembersModal();
+                closeAnnouncementModal();
             }
         });
 
@@ -1877,7 +2726,7 @@
                     }
                 }
 
-                await loadRemoteData();
+                await loadRemoteData(true);
                 renderAll();
                 document.getElementById('globalWeeklyGoalInput').value = settings.global_goal || '';
                 showToast(`Importação concluída: ${importedMembers} membro(s), ${importedLogs} registro(s).`);
